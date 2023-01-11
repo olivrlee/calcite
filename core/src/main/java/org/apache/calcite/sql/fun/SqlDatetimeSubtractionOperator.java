@@ -38,23 +38,21 @@ import org.apache.calcite.sql.validate.SqlMonotonicity;
  * In {@link org.apache.calcite.rex.RexNode} form, it has only two parameters,
  * and the return type describes the desired type of interval.
  *
- * <p>When being used for BigQuery's TIMESTAMP_SUB, TIME_SUB, and DATE_SUB, this
- * operator subtracts an interval value from a timestamp value. The return type
- * differs due to differing number of parameters and ordering. This is
- * accounted for by passing in a SqlReturnTypeInference which is passed in
- * by the standard MINUS_DATE and the library MINUS_DATE2 operators at their
- * respective initializations.
+ * <p>When being used for BigQuery's {@code TIMESTAMP_SUB}, {@code TIME_SUB},
+ * and {@code DATE_SUB} operators, this operator subtracts an interval value
+ * from a timestamp value. The return type differs due to differing number of
+ * parameters and ordering. This is accounted for by passing in a
+ * {@link SqlReturnTypeInference} which is passed in by
+ * the standard {@link SqlStdOperatorTable#MINUS_DATE MINUS_DATE}
+ * and the library {@link SqlInternalOperators#MINUS_DATE2 MINUS_DATE2}
+ * operators at their respective initializations.
  */
 public class SqlDatetimeSubtractionOperator extends SqlSpecialOperator {
   //~ Constructors -----------------------------------------------------------
 
-  public SqlDatetimeSubtractionOperator(SqlReturnTypeInference returnTypeInference) {
-    super(
-        "-",
-        SqlKind.MINUS,
-        40,
-        true,
-        returnTypeInference,
+  public SqlDatetimeSubtractionOperator(String name,
+      SqlReturnTypeInference returnTypeInference) {
+    super("-", SqlKind.MINUS, 40, true, returnTypeInference,
         InferTypes.FIRST_KNOWN, OperandTypes.MINUS_DATE_OPERATOR);
   }
 
