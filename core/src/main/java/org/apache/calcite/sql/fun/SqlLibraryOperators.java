@@ -664,6 +664,7 @@ public abstract class SqlLibraryOperators {
           TimeUnitRange.CENTURY,
           TimeUnitRange.DECADE,
           TimeUnitRange.YEAR,
+          TimeUnitRange.ISOYEAR,
           TimeUnitRange.QUARTER,
           TimeUnitRange.MONTH);
 
