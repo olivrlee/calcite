@@ -654,32 +654,6 @@ public abstract class SqlLibraryOperators {
           OperandTypes.STRING_STRING,
           SqlFunctionCategory.TIMEDATE);
 
-  private static final Set<TimeUnitRange> TIME_UNITS =
-      ImmutableSet.of(TimeUnitRange.HOUR,
-          TimeUnitRange.MINUTE,
-          TimeUnitRange.SECOND);
-
-  private static final Set<TimeUnitRange> MONTH_UNITS =
-      ImmutableSet.of(TimeUnitRange.MILLENNIUM,
-          TimeUnitRange.CENTURY,
-          TimeUnitRange.DECADE,
-          TimeUnitRange.YEAR,
-          TimeUnitRange.ISOYEAR,
-          TimeUnitRange.QUARTER,
-          TimeUnitRange.MONTH);
-
-  private static final Set<TimeUnitRange> DAY_UNITS =
-      ImmutableSet.of(TimeUnitRange.WEEK,
-          TimeUnitRange.DAY);
-
-  private static final Set<TimeUnitRange> DATE_UNITS =
-      ImmutableSet.<TimeUnitRange>builder()
-          .addAll(MONTH_UNITS).addAll(DAY_UNITS).build();
-
-  private static final Set<TimeUnitRange> TIMESTAMP_UNITS =
-      ImmutableSet.<TimeUnitRange>builder()
-          .addAll(DATE_UNITS).addAll(TIME_UNITS).build();
-
   /** The "TIMESTAMP_ADD(timestamp, interval)" function (BigQuery), the
    * two-argument variant of the built-in
    * {@link SqlStdOperatorTable#TIMESTAMP_ADD TIMESTAMPADD} function, which has
@@ -728,7 +702,7 @@ public abstract class SqlLibraryOperators {
       SqlBasicFunction.create("DATE_TRUNC",
           ReturnTypes.DATE_NULLABLE,
           OperandTypes.sequence("'DATE_TRUNC(<DATE>, <DATETIME_INTERVAL>)'",
-              OperandTypes.DATE, OperandTypes.interval(DATE_UNITS)),
+              OperandTypes.DATE, OperandTypes.dateInterval()),
           SqlFunctionCategory.TIMEDATE);
 
   /** The "TIME_SUB(time, interval)" function (BigQuery);
@@ -750,7 +724,7 @@ public abstract class SqlLibraryOperators {
       SqlBasicFunction.create("TIME_TRUNC",
           ReturnTypes.TIME_NULLABLE,
           OperandTypes.sequence("'TIME_TRUNC(<TIME>, <DATETIME_INTERVAL>)'",
-              OperandTypes.TIME, OperandTypes.interval(TIME_UNITS)),
+              OperandTypes.TIME, OperandTypes.timeInterval()),
           SqlFunctionCategory.TIMEDATE);
 
   /** The "TIMESTAMP_SUB(timestamp, interval)" function (BigQuery);
@@ -773,7 +747,7 @@ public abstract class SqlLibraryOperators {
           ReturnTypes.TIMESTAMP_NULLABLE,
           OperandTypes.sequence(
               "'TIMESTAMP_TRUNC(<TIMESTAMP>, <DATETIME_INTERVAL>)'",
-              OperandTypes.TIMESTAMP, OperandTypes.interval(TIMESTAMP_UNITS)),
+              OperandTypes.TIMESTAMP, OperandTypes.timestampInterval()),
           SqlFunctionCategory.TIMEDATE);
 
   /** The "TIMESTAMP_SECONDS(bigint)" function; returns a TIMESTAMP value
