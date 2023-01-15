@@ -229,16 +229,8 @@ public class TimeFrameTest {
     f.checkDateFloor("1970-08-03", f.isoWeek, is("1970-08-03")); // monday
     f.checkDateFloor("1970-08-04", f.isoWeek, is("1970-08-03")); // tuesday
 
-    f.checkDateFloor(
-        "1970-08-04",
-        "WEEK_MONDAY",
-        is("1970-08-03")
-    ); // tuesday
-    f.checkDateFloor(
-        "1970-08-04",
-        "WEEK_TUESDAY",
-        is("1970-08-04")
-    ); // tuesday
+    f.checkDateFloor("1970-08-04", "WEEK_MONDAY", is("1970-08-03")); // tuesday
+    f.checkDateFloor("1970-08-04", "WEEK_TUESDAY", is("1970-08-04")); // tuesday
 
     f.checkTimestampFloor("1970-01-01 01:23:45", HOUR,
         0, is("1970-01-01 01:00:00"));

@@ -4412,35 +4412,30 @@ public class SqlValidatorTest extends SqlValidatorTestCase {
    *  Checks WEEK(WEEKDAY)
    * <p>Override if your parser supports more such functions. */
   @Test void checkWeekdayCustomTimeFrames() {
-    final List<String> validWeekdays = asList(
-        "WEEK",
-        "WEEK(SUNDAY)",
-        "WEEK(MONDAY)",
-        "WEEK(TUESDAY)",
-        "WEEK(WEDNESDAY)",
-        "WEEK(THURSDAY)",
-        "WEEK(FRIDAY)",
-        "WEEK(SUNDAY)"
-    );
-
-    final List<String> invalidWeekdays = asList(
-        "A"
-    );
     SqlValidatorFixture f = fixture()
         .withOperatorTable(operatorTableFor(SqlLibrary.BIG_QUERY));
+
+    // Check that each valid code passes each query that it should.
     final String ds = "DATE '2022-12-25'";
     Consumer<String> validConsumer = weekday -> {
       f.withSql("select date_trunc(" + ds + ", " + weekday + ")").ok();
     };
+    validConsumer.accept("WEEK");
+    validConsumer.accept("WEEK(SUNDAY)");
+    validConsumer.accept("WEEK(MONDAY)");
+    validConsumer.accept("WEEK(TUESDAY)");
+    validConsumer.accept("WEEK(WEDNESDAY)");
+    validConsumer.accept("WEEK(THURSDAY)");
+    validConsumer.accept("WEEK(FRIDAY)");
+    validConsumer.accept("WEEK(SUNDAY)");
 
-    // Check that each valid code passes each query that it should.
-    validWeekdays.forEach(validConsumer);
-    String errorMessage = "'A' is not a valid time frame";
-    Consumer<String> invalidConsumer = invalidWeekday -> {
-      f.withSql("select date_trunc(" + ds + ", ^" + invalidWeekday + "^)")
+    // Check that each invalid code fails each query that it should.
+    Consumer<String> invalidConsumer = weekday -> {
+      String errorMessage = "'" + weekday + "' is not a valid time frame";
+      f.withSql("select date_trunc(" + ds + ", ^" + weekday + "^)")
           .fails(errorMessage);
     };
-    invalidWeekdays.forEach(invalidConsumer);
+    invalidConsumer.accept("A");
   }
 
   public void checkWinFuncExpWithWinClause(

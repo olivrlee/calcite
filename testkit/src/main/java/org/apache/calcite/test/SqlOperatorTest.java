@@ -8419,16 +8419,30 @@ public class SqlOperatorTest {
         "2015-02-19", "DATE NOT NULL");
     f.checkScalar("date_trunc(date '2015-02-19', week)",
         "2015-02-15", "DATE NOT NULL");
+    f.checkScalar("date_trunc(date '2015-02-19', isoweek)",
+        "2015-02-16", "DATE NOT NULL");
     f.checkScalar("date_trunc(date '2015-02-19', week(sunday))",
         "2015-02-15", "DATE NOT NULL");
     f.checkScalar("date_trunc(date '2015-02-19', week(monday))",
         "2015-02-16", "DATE NOT NULL");
+    f.checkScalar("date_trunc(date '2015-02-19', week(tuesday))",
+        "2015-02-17", "DATE NOT NULL");
+    f.checkScalar("date_trunc(date '2015-02-19', week(wednesday))",
+        "2015-02-18", "DATE NOT NULL");
+    f.checkScalar("date_trunc(date '2015-02-19', week(thursday))",
+        "2015-02-19", "DATE NOT NULL");
+    f.checkScalar("date_trunc(date '2015-02-19', week(friday))",
+        "2015-02-13", "DATE NOT NULL");
+    f.checkScalar("date_trunc(date '2015-02-19', week(saturday))",
+        "2015-02-14", "DATE NOT NULL");
     f.checkScalar("date_trunc(date '2015-02-19', month)",
         "2015-02-01", "DATE NOT NULL");
     f.checkScalar("date_trunc(date '2015-02-19', quarter)",
         "2015-01-01", "DATE NOT NULL");
     f.checkScalar("date_trunc(date '2015-02-19', year)",
         "2015-01-01", "DATE NOT NULL");
+    f.checkScalar("date_trunc(date '2015-02-19', isoyear)",
+        "2014-12-29", "DATE NOT NULL");
   }
 
   @Test void testDenseRankFunc() {
