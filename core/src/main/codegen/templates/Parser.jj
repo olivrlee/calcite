@@ -6142,6 +6142,8 @@ SqlNode BuiltinFunctionCall() :
     |
         node = DatetimeFunctionCall() { return node; }
     |
+        node = DatetimeTruncFunctionCall() { return node; }
+    |
         node = TimeFunctionCall() { return node; }
     |
         node = TimestampFunctionCall() { return node; }
@@ -6744,6 +6746,27 @@ SqlCall TimestampTruncFunctionCall() :
     unit = TimeUnitOrName() { args.add(unit); }
     <RPAREN> {
         return SqlLibraryOperators.TIMESTAMP_TRUNC.createCall(s.end(this), args);
+    }
+}
+
+/**
+ * Parses a call to DATETIME_TRUNC.
+ */
+SqlNode DatetimeTruncFunctionCall() :
+{
+    final List<SqlNode> args = new ArrayList<SqlNode>();
+    final Span s;
+    final SqlIntervalQualifier unit;
+    final SqlNode literal;
+}
+{
+    <DATETIME_TRUNC> { s = span(); }
+    <LPAREN>
+    AddExpression(args, ExprContext.ACCEPT_SUB_QUERY)
+    <COMMA>
+    unit = TimeUnitOrName() { args.add(unit); }
+    <RPAREN> {
+        return SqlLibraryOperators.DATETIME_TRUNC.createCall(s.end(this), args);
     }
 }
 
@@ -7649,6 +7672,7 @@ SqlPostfixOperator PostfixRowOperator() :
 |   < DATETIME: "DATETIME" >
 |   < DATETIME_INTERVAL_CODE: "DATETIME_INTERVAL_CODE" >
 |   < DATETIME_INTERVAL_PRECISION: "DATETIME_INTERVAL_PRECISION" >
+|   < DATETIME_TRUNC: "DATETIME_TRUNC" >
 |   < DAY: "DAY" >
 |   < DAYS: "DAYS" >
 |   < DEALLOCATE: "DEALLOCATE" >
