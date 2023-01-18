@@ -5974,6 +5974,23 @@ public class SqlParserTest {
         .ok("INTERVAL -'-1' QUARTER");
   }
 
+  public void subTestIntervalPlural() {
+    expr("interval '+2' seconds")
+        .ok("INTERVAL '+2' SECOND");
+    expr("interval '+2' hours")
+        .ok("INTERVAL '+2' HOUR");
+    expr("interval '+2' days")
+        .ok("INTERVAL '+2' DAY");
+    expr("interval '+2' weeks")
+        .ok("INTERVAL '+2' WEEK");
+    expr("interval '+2' quarters")
+        .ok("INTERVAL '+2' QUARTER");
+    expr("interval '+2' months")
+        .ok("INTERVAL '+2' MONTH");
+    expr("interval '+2' years")
+        .ok("INTERVAL '+2' YEAR");
+  }
+
   /**
    * Runs tests for INTERVAL... YEAR that should pass both parser and
    * validator. A substantially identical set of tests exists in
@@ -7664,6 +7681,7 @@ public class SqlParserTest {
     subTestIntervalSecondPositive();
     subTestIntervalWeekPositive();
     subTestIntervalQuarterPositive();
+    subTestIntervalPlural();
 
     subTestIntervalYearFailsValidation();
     subTestIntervalYearToMonthFailsValidation();
