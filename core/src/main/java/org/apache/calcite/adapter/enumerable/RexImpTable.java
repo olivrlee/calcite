@@ -2141,6 +2141,7 @@ public class RexImpTable {
             "timeUnitRange");
         switch (timeUnitRange) {
         case YEAR:
+        case ISOYEAR:
         case QUARTER:
         case MONTH:
         case WEEK:

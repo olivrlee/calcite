@@ -8268,7 +8268,7 @@ public class SqlOperatorTest {
         "DATE NOT NULL");
 
     f.checkScalar("date_sub(date '2016-02-24', interval 2 quarters)",
-        "2015-8-24",
+        "2015-08-24",
         "DATE NOT NULL");
 
     f.checkScalar("date_sub(date '2016-02-24', interval 5 year)",
