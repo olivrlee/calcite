@@ -52,7 +52,7 @@ import java.util.Properties;
 public class Driver extends UnregisteredDriver {
   public static final String CONNECT_STRING_PREFIX = "jdbc:calcite:";
 
-  final Function0<CalcitePrepare> prepareFactory;
+  public final Function0<CalcitePrepare> prepareFactory;
 
   static {
     new Driver().register();
@@ -62,6 +62,21 @@ public class Driver extends UnregisteredDriver {
   public Driver() {
     super();
     this.prepareFactory = createPrepareFactory();
+  }
+
+  private Driver(Function0<CalcitePrepare> prepareFactory) {
+    new Driver();
+    this.prepareFactory = prepareFactory;
+  }
+
+  /** Allows changing prepareFactory without having to subclass Driver.
+   *
+   * @param prepareFactory {@link org.apache.calcite.jdbc.CalcitePrepare}
+   * @return Driver with the provided prepareFactory
+   */
+  public Driver withPrepareFactory(Function0<CalcitePrepare> prepareFactory) {
+    return this.prepareFactory == prepareFactory
+        ? this : new Driver(prepareFactory);
   }
 
   protected Function0<CalcitePrepare> createPrepareFactory() {
