@@ -52,7 +52,7 @@ import java.util.Properties;
 public class Driver extends UnregisteredDriver {
   public static final String CONNECT_STRING_PREFIX = "jdbc:calcite:";
 
-  public final Function0<CalcitePrepare> prepareFactory;
+  final Function0<CalcitePrepare> prepareFactory;
 
   static {
     new Driver().register();
@@ -65,7 +65,7 @@ public class Driver extends UnregisteredDriver {
   }
 
   private Driver(Function0<CalcitePrepare> prepareFactory) {
-    new Driver();
+    super();
     this.prepareFactory = prepareFactory;
   }
 
