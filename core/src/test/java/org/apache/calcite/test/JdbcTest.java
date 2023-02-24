@@ -771,6 +771,11 @@ public class JdbcTest {
     }
   }
 
+  @Test void testCustomValidator() {
+    final Driver driver = new MockDdlDriver().withPrepareFactory(MockPrepareImpl::new);
+    assertTrue(driver.prepareFactory.apply().getClass() == MockPrepareImpl.class);
+  }
+
   /**
    * The example in the README.
    */
@@ -8295,6 +8300,12 @@ public class JdbcTest {
           };
         }
       };
+    }
+  }
+
+  /** Dummy subclass of CalcitePrepareImpl. */
+  public static class MockPrepareImpl extends CalcitePrepareImpl {
+    public MockPrepareImpl() {
     }
   }
 
