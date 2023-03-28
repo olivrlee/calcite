@@ -826,6 +826,37 @@ class RelWriterTest {
         .assertThatPlan(isLinux(expected));
   }
 
+  @Test void testSearchOperator() {
+    final FrameworkConfig config = RelBuilderTest.config().build();
+    final RelBuilder b = RelBuilder.create(config);
+    // Commented out but we should also get this passing! SEARCH in a relnode using the json writer
+    // also leads to failures.
+    // final RelNode rel = b
+    //     .scan("EMP")
+    //     .project(
+    //         b.between(
+    //             b.field("DEPTNO"),
+    //             b.literal(20),
+    //             b.literal(30))
+    //     )
+    //     .build();
+    // final RelJsonWriter jsonWriter = new RelJsonWriter(new JsonBuilder(), RelJson::withLibraryOperatorTable);
+    // rel.explain(jsonWriter);
+    // String relJsonString = jsonWriter.asString();
+    // String result = deserializeAndDumpToTextFormat(getSchema(rel), relJsonString);
+    // final String expected = "<TODO>";
+    // assertThat(result, isLinux(expected));
+
+    RexNode between = b.getRexBuilder().makeBetween(
+        b.literal(45),
+        b.literal(20),
+        b.literal(30));
+    RelJson relJson = RelJson.create().withJsonBuilder(new JsonBuilder());
+    Object rexified = relJson.toJson(between);
+    RexNode deserialize = relJson.toRex(b.getCluster(), rexified);
+    assertThat(deserialize.hashCode(), is(between.hashCode()));
+  }
+
   @ParameterizedTest
   @MethodSource("explainFormats")
   void testAggregateWithAlias(SqlExplainFormat format) {
