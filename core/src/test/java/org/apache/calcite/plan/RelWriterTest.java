@@ -914,7 +914,8 @@ class RelWriterTest {
     //             b.literal(30))
     //     )
     //     .build();
-    // final RelJsonWriter jsonWriter = new RelJsonWriter(new JsonBuilder(), RelJson::withLibraryOperatorTable);
+    // final RelJsonWriter jsonWriter =
+    // new RelJsonWriter(new JsonBuilder(), RelJson::withLibraryOperatorTable);
     // rel.explain(jsonWriter);
     // String relJsonString = jsonWriter.asString();
     // String result = deserializeAndDumpToTextFormat(getSchema(rel), relJsonString);
@@ -935,9 +936,9 @@ class RelWriterTest {
     RelJson relJson = RelJson.create().withJsonBuilder(new JsonBuilder());
     final ObjectMapper mapper = new ObjectMapper();
     final TypeReference<LinkedHashMap<String, Object>> typeRef =
-        new TypeReference<LinkedHashMap<String, Object>>() {};
+        new TypeReference<LinkedHashMap<String, Object>>() { };
     List<RexNode> testNodes = ImmutableList.of(between, inNode);
-    for (RexNode node: testNodes){
+    for (RexNode node: testNodes) {
       Object rexified = relJson.toJson(node);
       // Test toJson -> toRex -> toJson is the same.
       RexNode deserialized = relJson.toRex(b.getCluster(), rexified);
