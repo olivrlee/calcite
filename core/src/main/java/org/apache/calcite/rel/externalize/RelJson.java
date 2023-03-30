@@ -432,11 +432,12 @@ public class RelJson {
         || value instanceof Boolean) {
       return value;
     } else if (value instanceof RexNode) {
-      if(!CALCITE_5614_FIXED){
+      if (!CALCITE_5614_FIXED) {
         // Expanding SEARCH operator because toJson doesn't currently support handling Sarg
-        if (((RexNode) value).getKind().equals(SqlKind.SEARCH)){
+        if (((RexNode) value).getKind().equals(SqlKind.SEARCH)) {
           Object expandedNode =
-              RexUtil.expandSearch(new RexBuilder(new JavaTypeFactoryImpl()), null, (RexNode) value);
+              RexUtil.expandSearch(new RexBuilder(new JavaTypeFactoryImpl()),
+                  null, (RexNode) value);
           return toJson(expandedNode);
         }
       }
