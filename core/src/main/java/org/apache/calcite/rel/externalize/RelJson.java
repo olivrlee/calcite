@@ -569,6 +569,14 @@ public class RelJson {
         map.put("type", toJson(call.getType()));
         final List<@Nullable Object> list = jsonBuilder().list();
         for (RexNode operand : call.getOperands()) {
+          if (!CALCITE_5614_FIXED) {
+            // Expanding SEARCH operator because toJson doesn't currently support handling Sarg
+            if (operand.getKind().equals(SqlKind.SEARCH)) {
+              operand =
+                  RexUtil.expandSearch(new RexBuilder(new JavaTypeFactoryImpl()),
+                      null, operand);
+            }
+          }
           list.add(toJson(operand));
         }
         map.put("operands", list);
