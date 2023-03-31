@@ -432,15 +432,6 @@ public class RelJson {
         || value instanceof Boolean) {
       return value;
     } else if (value instanceof RexNode) {
-      if (!CALCITE_5614_FIXED) {
-        // Expanding SEARCH operator because toJson doesn't currently support handling Sarg
-        if (((RexNode) value).getKind().equals(SqlKind.SEARCH)) {
-          Object expandedNode =
-              RexUtil.expandSearch(new RexBuilder(new JavaTypeFactoryImpl()),
-                  null, (RexNode) value);
-          return toJson(expandedNode);
-        }
-      }
       return toJson((RexNode) value);
     } else if (value instanceof RexWindow) {
       return toJson((RexWindow) value);
@@ -561,6 +552,11 @@ public class RelJson {
       map.put("correl", ((RexCorrelVariable) node).getName());
       map.put("type", toJson(node.getType()));
       return map;
+    case SEARCH:
+      if (!CALCITE_5614_FIXED) {
+        // Expanding SEARCH operator because toJson doesn't currently support handling Sarg
+        return toJson(RexUtil.expandSearch(new RexBuilder(new JavaTypeFactoryImpl()), null, node));
+      }
     default:
       if (node instanceof RexCall) {
         final RexCall call = (RexCall) node;
@@ -569,14 +565,6 @@ public class RelJson {
         map.put("type", toJson(call.getType()));
         final List<@Nullable Object> list = jsonBuilder().list();
         for (RexNode operand : call.getOperands()) {
-          if (!CALCITE_5614_FIXED) {
-            // Expanding SEARCH operator because toJson doesn't currently support handling Sarg
-            if (operand.getKind().equals(SqlKind.SEARCH)) {
-              operand =
-                  RexUtil.expandSearch(new RexBuilder(new JavaTypeFactoryImpl()),
-                      null, operand);
-            }
-          }
           list.add(toJson(operand));
         }
         map.put("operands", list);
