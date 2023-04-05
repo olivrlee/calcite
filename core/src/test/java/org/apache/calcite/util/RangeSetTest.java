@@ -17,6 +17,7 @@
 package org.apache.calcite.util;
 
 import org.apache.calcite.linq4j.Ord;
+import org.apache.calcite.rel.externalize.RelJson;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableRangeSet;
@@ -27,6 +28,7 @@ import com.google.common.collect.TreeRangeSet;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,6 +46,57 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @SuppressWarnings("UnstableApiUsage")
 class RangeSetTest {
+
+  /** Tests {@link org.apache.calcite.rel.externalize.RelJson#toJson(Range)} and
+   *  {@link RangeSets#rangeFromJson(Object)}.
+   */
+  @Test void testRangeSetSerializeDeserialize() {
+    RelJson relJson = RelJson.create();
+    final Range<BigDecimal> point = Range.singleton(BigDecimal.valueOf(0));
+    final Range<BigDecimal> closedRange1 = Range.closed(
+        BigDecimal.valueOf(0), BigDecimal.valueOf(5));
+    final Range<BigDecimal> closedRange2 = Range.closed(
+        BigDecimal.valueOf(6), BigDecimal.valueOf(10));
+
+    final Range<BigDecimal> gt1 = Range.greaterThan(BigDecimal.valueOf(7));
+    final Range<BigDecimal> al1 = Range.atLeast(BigDecimal.valueOf(8));
+    final Range<BigDecimal> lt1 = Range.lessThan(BigDecimal.valueOf(4));
+    final Range<BigDecimal> am1 = Range.atMost(BigDecimal.valueOf(3));
+
+    // Test serialize/deserialize Range
+    //    Point
+    assertThat(RangeSets.rangeFromJson(relJson.toJson(point)), is(point));
+    //    Closed Range
+    assertThat(RangeSets.rangeFromJson(relJson.toJson(closedRange1)), is(closedRange1));
+    //    Open Range
+    assertThat(RangeSets.rangeFromJson(relJson.toJson(gt1)), is(gt1));
+    assertThat(RangeSets.rangeFromJson(relJson.toJson(al1)), is(al1));
+    assertThat(RangeSets.rangeFromJson(relJson.toJson(lt1)), is(lt1));
+    assertThat(RangeSets.rangeFromJson(relJson.toJson(am1)), is(am1));
+    // Test closed single RangeSet
+    final RangeSet<BigDecimal> closedRangeSet = ImmutableRangeSet.of(closedRange1);
+    assertThat(RangeSets.fromJson(relJson.toJson(closedRangeSet)), is(closedRangeSet));
+    // Test complex RangeSets
+    final RangeSet<BigDecimal> complexClosedRangeSet1 = ImmutableRangeSet.<BigDecimal>builder()
+        .add(closedRange1)
+        .add(closedRange2)
+        .build();
+    assertThat(RangeSets.fromJson(relJson.toJson(complexClosedRangeSet1)),
+        is(complexClosedRangeSet1));
+    final RangeSet<BigDecimal> complexClosedRangeSet2 = ImmutableRangeSet.<BigDecimal>builder()
+        .add(gt1)
+        .add(am1)
+        .build();
+    assertThat(RangeSets.fromJson(relJson.toJson(complexClosedRangeSet2)),
+        is(complexClosedRangeSet2));
+
+    // Test None and All
+    final RangeSet<BigDecimal> setNone = ImmutableRangeSet.of();
+    final RangeSet<BigDecimal> setAll = setNone.complement();
+    assertThat(RangeSets.fromJson(relJson.toJson(setNone)), is(setNone));
+    assertThat(RangeSets.fromJson(relJson.toJson(setAll)), is(setAll));
+  }
+
   /** Tests {@link RangeSets#minus(RangeSet, Range)}. */
   @SuppressWarnings("UnstableApiUsage")
   @Test void testRangeSetMinus() {

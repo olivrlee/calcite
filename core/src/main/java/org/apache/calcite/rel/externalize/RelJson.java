@@ -65,9 +65,12 @@ import org.apache.calcite.sql.validate.SqlNameMatchers;
 import org.apache.calcite.util.ImmutableBitSet;
 import org.apache.calcite.util.ImmutableIntList;
 import org.apache.calcite.util.JsonBuilder;
+import org.apache.calcite.util.RangeSets;
 import org.apache.calcite.util.Sarg;
 import org.apache.calcite.util.Util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
@@ -464,7 +467,14 @@ public class RelJson {
       return toJson((RelDataTypeField) value);
     } else if (value instanceof RelDistribution) {
       return toJson((RelDistribution) value);
-    } else {
+    } else if (value instanceof Sarg) {
+      return toJson((Sarg) value);
+    } else if (value instanceof RangeSet) {
+      return toJson((RangeSet) value);
+    } else if (value instanceof Range) {
+      return toJson((Range) value);
+    }
+    else {
       throw new UnsupportedOperationException("type not serializable: "
           + value + " (type " + value.getClass().getCanonicalName() + ")");
     }
@@ -483,7 +493,7 @@ public class RelJson {
   }
 
   private <C extends Comparable<C>> Object toJson(RangeSet<C> rangeSet) {
-    final List<Object> list = jsonBuilder().list();
+    final List<Object> list = new ArrayList<>();
     try {
       for (Range<C> range : rangeSet.asRanges()) {
         list.add(toJson(range));
@@ -496,11 +506,25 @@ public class RelJson {
   /** Serializes a {@link Range} that can be deserialized using
    * {@link org.apache.calcite.util.RangeSets#rangeFromJson(Object)} */
   private <C extends Comparable<C>> Object toJson(Range<C> range){
-      return Arrays.asList(
-          range.lowerBoundType() == BoundType.OPEN ? "(": "[",
-          range.lowerEndpoint(),
-          range.upperEndpoint(),
-          range.upperBoundType() == BoundType.OPEN ? ")" : "]");
+    String lowerBoundType = !range.hasLowerBound() || range.lowerBoundType() == BoundType.OPEN ?
+        "(": "[";
+    String upperBoundType = !range.hasUpperBound() || range.upperBoundType() == BoundType.OPEN ?
+        ")" : "]";
+    String lowerEndpoint = range.hasLowerBound() ? rexLiteralObjectToString(range.lowerEndpoint())
+        : RangeSets.RANGE_UNBOUNDED;
+    String upperEndpoint = range.hasUpperBound() ? rexLiteralObjectToString(range.upperEndpoint())
+        : RangeSets.RANGE_UNBOUNDED;
+
+    return Arrays.asList(lowerBoundType, lowerEndpoint, upperEndpoint, upperBoundType);
+    }
+
+    private <C extends Comparable<C>> String rexLiteralObjectToString(C endpoint) {
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      return mapper.writeValueAsString(endpoint);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Failed to serialize Range endpoint: ", e);
+    }
     }
 
   private Object toJson(RelDataType node) {
@@ -568,7 +592,7 @@ public class RelJson {
       final Object value = literal.getValue3();
       map = jsonBuilder().map();
       if (((RexLiteral) node).getTypeName().getName().equalsIgnoreCase(Sarg.class.getSimpleName())) {
-        map.put("sargLiteral", toJson((Sarg) value));
+        map.put("sargLiteral", toJson(value));
       } else {
         map.put("literal", RelEnumTypes.fromEnum(value));
       }
