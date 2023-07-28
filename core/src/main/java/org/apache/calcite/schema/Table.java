@@ -24,6 +24,8 @@ import org.apache.calcite.sql.SqlNode;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.HashMap;
+
 /**
  * Table.
  *
@@ -82,4 +84,15 @@ public interface Table {
    */
   boolean rolledUpColumnValidInsideAgg(String column, SqlCall call,
       @Nullable SqlNode parent, @Nullable CalciteConnectionConfig config);
+
+  /**
+   * Gets Looker Explore metadata if available.
+   */
+  default HashMap<String, String> getTableMetadata() {
+    HashMap<String, String> map = new HashMap<>();
+    map.put("EXPLORE_LABEL", null);
+    map.put("EXPLORE_DESCRIPTION", null);
+    map.put("EXPLORE_TAGS", null);
+    return map;
+  }
 }

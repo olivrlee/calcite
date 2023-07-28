@@ -75,6 +75,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -277,7 +278,10 @@ public class CalciteMetaImpl extends MetaImpl {
         "TYPE_SCHEM",
         "TYPE_NAME",
         "SELF_REFERENCING_COL_NAME",
-        "REF_GENERATION");
+        "REF_GENERATION",
+        "EXPLORE_LABEL",
+        "EXPLORE_DESCRIPTION",
+        "EXPLORE_TAGS");
   }
 
   @Override public MetaResultSet getTypeInfo(ConnectionHandle ch) {
@@ -386,10 +390,13 @@ public class CalciteMetaImpl extends MetaImpl {
               requireNonNull(schema.calciteSchema.getTable(name, true),
                   () -> "table " + name + " is not found (case sensitive)")
                   .getTable();
+          HashMap<String, String> metadataMap = (table.getTableMetadata() != null)
+              ? table.getTableMetadata() : new HashMap<>();
           return new CalciteMetaTable(table,
               schema.tableCatalog,
               schema.tableSchem,
-              name);
+              name,
+              metadataMap);
         })
         .concat(
             Linq4j.asEnumerable(
@@ -397,10 +404,13 @@ public class CalciteMetaImpl extends MetaImpl {
                     .entrySet())
                 .select(pair -> {
                   final Table table = pair.getValue();
+                  HashMap<String, String> metadataMap = (table.getTableMetadata() != null)
+                      ? table.getTableMetadata() : new HashMap<>();
                   return new CalciteMetaTable(table,
                       schema.tableCatalog,
                       schema.tableSchem,
-                      pair.getKey());
+                      pair.getKey(),
+                      metadataMap);
                 }));
   }
 
@@ -829,6 +839,12 @@ public class CalciteMetaImpl extends MetaImpl {
         String tableSchem, String tableName) {
       super(tableCat, tableSchem, tableName,
           calciteTable.getJdbcTableType().jdbcName);
+      this.calciteTable = requireNonNull(calciteTable, "calciteTable");
+    }
+    CalciteMetaTable(Table calciteTable, String tableCat,
+        String tableSchem, String tableName, HashMap<String, String> metadataMap) {
+      super(tableCat, tableSchem, tableName,
+          calciteTable.getJdbcTableType().jdbcName, metadataMap);
       this.calciteTable = requireNonNull(calciteTable, "calciteTable");
     }
   }

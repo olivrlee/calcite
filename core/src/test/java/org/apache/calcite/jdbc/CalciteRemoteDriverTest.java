@@ -129,6 +129,17 @@ class CalciteRemoteDriverTest {
         }
       };
 
+  private static final Function<Connection, ResultSet> GET_TABLES =
+      connection -> {
+        try {
+          return connection.getMetaData().getTables(connection.getCatalog(), null, null,
+              new String[] {"TABLE"});
+        } catch (SQLException e) {
+          throw TestUtil.rethrow(e);
+        }
+      };
+
+
   private static final Function<Connection, ResultSet> GET_TYPEINFO =
       connection -> {
         try {
@@ -282,6 +293,22 @@ class CalciteRemoteDriverTest {
         .with(CalciteRemoteDriverTest::getRemoteConnection)
         .metaData(GET_COLUMNS)
         .returns(CalciteAssert.checkResultContains("COLUMN_NAME=EMPNO"));
+  }
+
+  @Test void testRemoteTables() throws SQLException {
+    final Connection connection =
+        DriverManager.getConnection("jdbc:avatica:remote:factory=" + LJS);
+    assertThat(connection.isClosed(), is(false));
+    final ResultSet resultSet =
+        connection.getMetaData().getTables(connection.getCatalog(), null, null, new String[] {"TABLE"});
+    final ResultSetMetaData metaData = resultSet.getMetaData();
+    assertThat(metaData.getColumnCount(), is(13));
+    assertThat(metaData.getColumnName(11), is("EXPLORE_LABEL"));
+    assertThat(metaData.getColumnName(12), is("EXPLORE_DESCRIPTION"));
+    assertThat(metaData.getColumnName(13), is("EXPLORE_TAGS"));
+    resultSet.close();
+    connection.close();
+    assertThat(connection.isClosed(), is(true));
   }
 
   @Test void testRemoteTypeInfo() {
