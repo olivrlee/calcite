@@ -96,6 +96,9 @@ public interface Table {
     return map;
   }
 
+  /**
+   * Gets Looker Field metadata if available.
+   */
   default HashMap<String, HashMap<String, Object>> getFieldMetadata() {
     HashMap<String, HashMap<String, Object>> map = new HashMap<>();
     return map;
