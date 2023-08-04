@@ -295,12 +295,42 @@ class CalciteRemoteDriverTest {
         .returns(CalciteAssert.checkResultContains("COLUMN_NAME=EMPNO"));
   }
 
+  @Test void testRemoteColumnsMetadata() throws SQLException {
+    final Connection connection =
+        DriverManager.getConnection("jdbc:avatica:remote:factory=" + LJS);
+    final ResultSet resultSet = connection.getMetaData()
+        .getColumns(null, null, null, null);
+    final ResultSetMetaData metaData = resultSet.getMetaData();
+    assertThat(metaData.getColumnCount(), is(41));
+    assertThat(metaData.getColumnName(25), is("LOOKER_FIELD_DESCRIPTION"));
+    assertThat(metaData.getColumnName(26), is("LOOKER_FIELD_LABEL"));
+    assertThat(metaData.getColumnName(27), is("LOOKER_FIELD_NAME"));
+    assertThat(metaData.getColumnName(28), is("LOOKER_VIEW_NAME"));
+    assertThat(metaData.getColumnName(29), is("LOOKER_VIEW_LABEL"));
+    assertThat(metaData.getColumnName(30), is("HIDDEN"));
+    assertThat(metaData.getColumnName(31), is("LOOKER_FIELD_GROUP_VARIANT"));
+    assertThat(metaData.getColumnName(32), is("DIMENSION_GROUP"));
+    assertThat(metaData.getColumnName(33), is("LOOKER_FIELD_CATEGORY"));
+    assertThat(metaData.getColumnName(34), is("LOOKER_USE_STRICT_VALUE_FORMAT"));
+    assertThat(metaData.getColumnName(35), is("REQUIRES_REFRESH_ON_SORT"));
+    assertThat(metaData.getColumnName(36), is("SORTABLE"));
+    assertThat(metaData.getColumnName(37), is("VALUE_FORMAT"));
+    assertThat(metaData.getColumnName(38), is("LOOKER_TYPE"));
+    assertThat(metaData.getColumnName(39), is("LOOKER_FIELD_ALIAS"));
+    assertThat(metaData.getColumnName(40), is("TAGS"));
+    assertThat(metaData.getColumnName(41), is("FILTERS"));
+    resultSet.close();
+    connection.close();
+    assertThat(connection.isClosed(), is(true));
+  }
+
   @Test void testRemoteTables() throws SQLException {
     final Connection connection =
         DriverManager.getConnection("jdbc:avatica:remote:factory=" + LJS);
     assertThat(connection.isClosed(), is(false));
     final ResultSet resultSet =
-        connection.getMetaData().getTables(connection.getCatalog(), null, null, new String[] {"TABLE"});
+        connection.getMetaData().getTables(
+            connection.getCatalog(), null, null, new String[] {"TABLE"});
     final ResultSetMetaData metaData = resultSet.getMetaData();
     assertThat(metaData.getColumnCount(), is(13));
     assertThat(metaData.getColumnName(11), is("EXPLORE_LABEL"));
