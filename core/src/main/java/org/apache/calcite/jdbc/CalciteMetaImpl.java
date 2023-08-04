@@ -345,7 +345,24 @@ public class CalciteMetaImpl extends MetaImpl {
         "SCOPE_TABLE",
         "SOURCE_DATA_TYPE",
         "IS_AUTOINCREMENT",
-        "IS_GENERATEDCOLUMN");
+        "IS_GENERATEDCOLUMN",
+        "LOOKER_FIELD_DESCRIPTION",
+        "LOOKER_FIELD_LABEL",
+        "LOOKER_FIELD_NAME",
+        "LOOKER_VIEW_NAME",
+        "LOOKER_VIEW_LABEL",
+        "HIDDEN",
+        "LOOKER_FIELD_GROUP_VARIANT",
+        "DIMENSION_GROUP",
+        "LOOKER_FIELD_CATEGORY",
+        "LOOKER_USE_STRICT_VALUE_FORMAT",
+        "REQUIRES_REFRESH_ON_SORT",
+        "SORTABLE",
+        "VALUE_FORMAT",
+        "LOOKER_TYPE",
+        "LOOKER_FIELD_ALIAS",
+        "TAGS",
+        "FILTERS");
   }
 
   Enumerable<MetaCatalog> catalogs() {
@@ -390,7 +407,7 @@ public class CalciteMetaImpl extends MetaImpl {
               requireNonNull(schema.calciteSchema.getTable(name, true),
                   () -> "table " + name + " is not found (case sensitive)")
                   .getTable();
-          HashMap<String, String> metadataMap = (table.getTableMetadata() != null)
+          HashMap<String, Object> metadataMap = (table.getTableMetadata() != null)
               ? table.getTableMetadata() : new HashMap<>();
           return new CalciteMetaTable(table,
               schema.tableCatalog,
@@ -404,7 +421,7 @@ public class CalciteMetaImpl extends MetaImpl {
                     .entrySet())
                 .select(pair -> {
                   final Table table = pair.getValue();
-                  HashMap<String, String> metadataMap = (table.getTableMetadata() != null)
+                  HashMap<String, Object> metadataMap = (table.getTableMetadata() != null)
                       ? table.getTableMetadata() : new HashMap<>();
                   return new CalciteMetaTable(table,
                       schema.tableCatalog,
@@ -459,6 +476,9 @@ public class CalciteMetaImpl extends MetaImpl {
 
   public Enumerable<MetaColumn> columns(final MetaTable table_) {
     final CalciteMetaTable table = (CalciteMetaTable) table_;
+    HashMap<String, HashMap<String, Object>> metadataMap =
+        (table.calciteTable.getFieldMetadata() != null)
+        ? table.calciteTable.getFieldMetadata() : new HashMap<>();
     final RelDataType rowType =
         table.calciteTable.getRowType(getConnection().typeFactory);
     return Linq4j.asEnumerable(rowType.getFieldList())
@@ -500,7 +520,8 @@ public class CalciteMetaImpl extends MetaImpl {
               /*isGeneratedcolumn=*/
               field.getType().getSqlTypeName() == SqlTypeName.MEASURE
                   ? "YES"
-                  : "NO");
+                  : "NO",
+              metadataMap.getOrDefault(field.getName(), new HashMap()));
         });
   }
 
@@ -842,7 +863,7 @@ public class CalciteMetaImpl extends MetaImpl {
       this.calciteTable = requireNonNull(calciteTable, "calciteTable");
     }
     CalciteMetaTable(Table calciteTable, String tableCat,
-        String tableSchem, String tableName, HashMap<String, String> metadataMap) {
+        String tableSchem, String tableName, HashMap<String, Object> metadataMap) {
       super(tableCat, tableSchem, tableName,
           calciteTable.getJdbcTableType().jdbcName, metadataMap);
       this.calciteTable = requireNonNull(calciteTable, "calciteTable");

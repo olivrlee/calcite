@@ -88,11 +88,16 @@ public interface Table {
   /**
    * Gets Looker Explore metadata if available.
    */
-  default HashMap<String, String> getTableMetadata() {
-    HashMap<String, String> map = new HashMap<>();
+  default HashMap<String, Object> getTableMetadata() {
+    HashMap<String, Object> map = new HashMap<>();
     map.put("EXPLORE_LABEL", null);
     map.put("EXPLORE_DESCRIPTION", null);
     map.put("EXPLORE_TAGS", null);
+    return map;
+  }
+
+  default HashMap<String, HashMap<String, Object>> getFieldMetadata() {
+    HashMap<String, HashMap<String, Object>> map = new HashMap<>();
     return map;
   }
 }
