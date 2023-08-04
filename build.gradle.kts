@@ -329,6 +329,7 @@ allprojects {
 
     repositories {
         // RAT and Autostyle dependencies
+        // mavenLocal()
         mavenCentral()
     }
 
