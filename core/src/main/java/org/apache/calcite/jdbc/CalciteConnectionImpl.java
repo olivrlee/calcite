@@ -190,6 +190,11 @@ abstract class CalciteConnectionImpl
     return super.unwrap(iface);
   }
 
+  public Class<?> getMetaTableClass() {
+    Object clazz = info.getOrDefault("metaTableClass", null);
+    return clazz != null ? (Class<?>) clazz : null;
+  }
+
   @Override public CalciteStatement createStatement(int resultSetType,
       int resultSetConcurrency, int resultSetHoldability) throws SQLException {
     return (CalciteStatement) super.createStatement(resultSetType,

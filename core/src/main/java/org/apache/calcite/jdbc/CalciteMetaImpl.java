@@ -69,7 +69,10 @@ import com.google.common.primitives.Longs;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -90,14 +93,28 @@ import static java.util.Objects.requireNonNull;
  */
 public class CalciteMetaImpl extends MetaImpl {
   static final Driver DRIVER = new Driver();
+  private final Class metaTableClass;
 
+  // @Deprecated // to be removed before 2.0
   public CalciteMetaImpl(CalciteConnectionImpl connection) {
+    this(connection, CalciteMetaTable.class);
+  }
+
+  public CalciteMetaImpl(CalciteConnectionImpl connection, @Nullable Class<?> metaTableClass) {
     super(connection);
     this.connProps
         .setAutoCommit(false)
         .setReadOnly(false)
         .setTransactionIsolation(Connection.TRANSACTION_NONE);
     this.connProps.setDirty(false);
+
+    if (metaTableClass != null) {
+      assert CalciteMetaTable.class.isAssignableFrom(metaTableClass);
+      this.metaTableClass = metaTableClass;
+    } else {
+      this.metaTableClass = CalciteMetaTable.class;
+    }
+
   }
 
   static <T extends Named> Predicate1<T> namedMatcher(final Pat pattern) {
@@ -264,25 +281,41 @@ public class CalciteMetaImpl extends MetaImpl {
       typeFilter = v1 -> typeList.contains(v1.tableType);
     }
     final Predicate1<MetaSchema> schemaMatcher = namedMatcher(schemaPattern);
-    return createResultSet(schemas(catalog)
-            .where(schemaMatcher)
-            .selectMany(schema -> tables(schema, matcher(tableNamePattern)))
-            .where(typeFilter),
-        MetaTable.class,
-        "TABLE_CAT",
-        "TABLE_SCHEM",
-        "TABLE_NAME",
-        "TABLE_TYPE",
-        "REMARKS",
-        "TYPE_CAT",
-        "TYPE_SCHEM",
-        "TYPE_NAME",
-        "SELF_REFERENCING_COL_NAME",
-        "REF_GENERATION",
-        "EXPLORE_LABEL",
-        "EXPLORE_DESCRIPTION",
-        "EXPLORE_TAGS");
+    Enumerable<MetaTable> tables = schemas(catalog)
+        .where(schemaMatcher)
+        .selectMany(schema -> tables(schema, matcher(tableNamePattern)))
+        .where(typeFilter);
+    String[] cNames;
+    try {
+      Method m = this.metaTableClass.getMethod("getColumnNames");
+      List<String> columnNames = (List<String>) m.invoke(null);
+      cNames = columnNames.toArray(new String[0]);
+    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+      throw new RuntimeException(e);
+    }
+
+    return createResultSet(tables,
+        this.metaTableClass,
+        cNames);
   }
+
+  // // Looks at the identified tables and determines if an override for the MetaTable class
+  // // has been provided.
+  // private Pair<Class<?>, List<String>> determineClass(Iterator<MetaTable> tables) {
+  //   try {
+  //     while (tables.hasNext()) {
+  //       MetaTable t = tables.next();
+  //       CalciteMetaTable t1 = (CalciteMetaTable) t;
+  //       Class metaTableClass = t1.calciteTable.getMetaTableClass();
+  //       if (metaTableClass != CalciteMetaTable.class) {
+  //         return Pair.of(metaTableClass, t1.getAdditionalColumnNames());
+  //       }
+  //     }
+  //   } catch (Exception e) {
+  //
+  //   }
+  //   return Pair.of(MetaTable.class, new ArrayList<>());
+  // }
 
   @Override public MetaResultSet getTypeInfo(ConnectionHandle ch) {
     return createResultSet(allTypeInfo(),
@@ -399,6 +432,21 @@ public class CalciteMetaImpl extends MetaImpl {
             tables(schema, Functions.<String>truePredicate1()));
   }
 
+  /** If CalciteMetaImpl was created with a sublcass for CalciteMetaTable, tables() will return
+   * instances of the subclass instead of CalciteMetaTable.  */
+  private MetaTable getMetaTables(Table table, String tableCatalog,
+      String tableSchem, String name) {
+    try {
+      Constructor<?> constructor =
+          this.metaTableClass.getDeclaredConstructor(Table.class, String.class,
+              String.class, String.class);
+      return (MetaTable) constructor.newInstance(table, tableCatalog, tableSchem, name);
+    } catch (NoSuchMethodException | InstantiationException | IllegalAccessException
+             | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   Enumerable<MetaTable> tables(final MetaSchema schema_) {
     final CalciteMetaSchema schema = (CalciteMetaSchema) schema_;
     return Linq4j.asEnumerable(schema.calciteSchema.getTableNames())
@@ -407,13 +455,7 @@ public class CalciteMetaImpl extends MetaImpl {
               requireNonNull(schema.calciteSchema.getTable(name, true),
                   () -> "table " + name + " is not found (case sensitive)")
                   .getTable();
-          HashMap<String, Object> metadataMap = (table.getTableMetadata() != null)
-              ? table.getTableMetadata() : new HashMap<>();
-          return new CalciteMetaTable(table,
-              schema.tableCatalog,
-              schema.tableSchem,
-              name,
-              metadataMap);
+          return getMetaTables(table, schema.tableCatalog, schema.tableSchem, name);
         })
         .concat(
             Linq4j.asEnumerable(
@@ -421,13 +463,10 @@ public class CalciteMetaImpl extends MetaImpl {
                     .entrySet())
                 .select(pair -> {
                   final Table table = pair.getValue();
-                  HashMap<String, Object> metadataMap = (table.getTableMetadata() != null)
-                      ? table.getTableMetadata() : new HashMap<>();
-                  return new CalciteMetaTable(table,
+                  return getMetaTables(table,
                       schema.tableCatalog,
                       schema.tableSchem,
-                      pair.getKey(),
-                      metadataMap);
+                      pair.getKey());
                 }));
   }
 
@@ -520,8 +559,7 @@ public class CalciteMetaImpl extends MetaImpl {
               /*isGeneratedcolumn=*/
               field.getType().getSqlTypeName() == SqlTypeName.MEASURE
                   ? "YES"
-                  : "NO",
-              metadataMap.getOrDefault(field.getName(), new HashMap()));
+                  : "NO");
         });
   }
 
@@ -853,19 +891,13 @@ public class CalciteMetaImpl extends MetaImpl {
   }
 
   /** Metadata describing a Calcite table. */
-  private static class CalciteMetaTable extends MetaTable {
+  public static class CalciteMetaTable extends MetaTable {
     private final Table calciteTable;
 
     CalciteMetaTable(Table calciteTable, String tableCat,
         String tableSchem, String tableName) {
       super(tableCat, tableSchem, tableName,
           calciteTable.getJdbcTableType().jdbcName);
-      this.calciteTable = requireNonNull(calciteTable, "calciteTable");
-    }
-    CalciteMetaTable(Table calciteTable, String tableCat,
-        String tableSchem, String tableName, HashMap<String, Object> metadataMap) {
-      super(tableCat, tableSchem, tableName,
-          calciteTable.getJdbcTableType().jdbcName, metadataMap);
       this.calciteTable = requireNonNull(calciteTable, "calciteTable");
     }
   }

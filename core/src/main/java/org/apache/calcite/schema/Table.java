@@ -25,6 +25,7 @@ import org.apache.calcite.sql.SqlNode;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Table.
@@ -88,8 +89,8 @@ public interface Table {
   /**
    * Gets Looker Explore metadata if available.
    */
-  default HashMap<String, Object> getTableMetadata() {
-    HashMap<String, Object> map = new HashMap<>();
+  default Map<String, Object> getTableMetadata() {
+    Map<String, Object> map = new HashMap<>();
     map.put("EXPLORE_LABEL", null);
     map.put("EXPLORE_DESCRIPTION", null);
     map.put("EXPLORE_TAGS", null);
