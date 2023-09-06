@@ -365,24 +365,7 @@ public class CalciteMetaImpl extends MetaImpl {
         "SCOPE_TABLE",
         "SOURCE_DATA_TYPE",
         "IS_AUTOINCREMENT",
-        "IS_GENERATEDCOLUMN",
-        "LOOKER_FIELD_ALIAS",
-        "LOOKER_FIELD_CATEGORY",
-        "LOOKER_FIELD_DESCRIPTION",
-        "LOOKER_FIELD_GROUP_VARIANT",
-        "LOOKER_FIELD_LABEL",
-        "LOOKER_FIELD_NAME",
-        "LOOKER_TYPE",
-        "LOOKER_USE_STRICT_VALUE_FORMAT",
-        "LOOKER_VIEW_NAME",
-        "LOOKER_VIEW_LABEL",
-        "HIDDEN",
-        "DIMENSION_GROUP",
-        "REQUIRES_REFRESH_ON_SORT",
-        "SORTABLE",
-        "VALUE_FORMAT",
-        "TAGS",
-        "FILTERS");
+        "IS_GENERATEDCOLUMN");
   }
 
   Enumerable<MetaCatalog> catalogs() {

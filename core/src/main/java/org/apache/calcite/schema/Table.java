@@ -87,21 +87,18 @@ public interface Table {
       @Nullable SqlNode parent, @Nullable CalciteConnectionConfig config);
 
   /**
-   * Gets Looker Explore metadata if available.
+   * Overload to provide additional table metadata if available.
    */
   default Map<String, Object> getTableMetadata() {
     Map<String, Object> map = new HashMap<>();
-    map.put("EXPLORE_LABEL", null);
-    map.put("EXPLORE_DESCRIPTION", null);
-    map.put("EXPLORE_TAGS", null);
     return map;
   }
 
   /**
-   * Gets Looker Field metadata if available.
+   * Overload to provide additional column metadata if available.
    */
-  default HashMap<String, HashMap<String, Object>> getFieldMetadata() {
-    HashMap<String, HashMap<String, Object>> map = new HashMap<>();
+  default Map<String, Map<String, Object>> getColumnMetadata() {
+    Map<String, Map<String, Object>> map = new HashMap<>();
     return map;
   }
 }
