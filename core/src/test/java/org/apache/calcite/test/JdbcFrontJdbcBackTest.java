@@ -84,6 +84,9 @@ class JdbcFrontJdbcBackTest {
   public static class MetaExtraTable extends CalciteMetaTable {
     public final String extraLabel;
 
+    // Got a RedundantModifier alert, however CalciteMetaImpl does need this constructor to be
+    // explicitly public in order to create an instance.
+    // CHECKSTYLE: IGNORE 2
     public MetaExtraTable(Table calciteTable, String tableCat,
         String tableSchem, String tableName) {
       super(calciteTable, tableCat, tableSchem, tableName);
