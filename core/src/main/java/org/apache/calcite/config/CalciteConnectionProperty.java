@@ -19,6 +19,7 @@ package org.apache.calcite.config;
 import org.apache.calcite.avatica.ConnectionProperty;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.avatica.util.Quoting;
+import org.apache.calcite.jdbc.CalciteMetaImpl.CalciteMetaTable;
 import org.apache.calcite.model.JsonSchema;
 import org.apache.calcite.sql.validate.SqlConformanceEnum;
 
@@ -105,6 +106,9 @@ public enum CalciteConnectionProperty implements ConnectionProperty {
    * <p>The name of a class that implements
    * {@link org.apache.calcite.sql.parser.SqlParserImplFactory}. */
   PARSER_FACTORY("parserFactory", Type.PLUGIN, null, false),
+
+  /** The CalciteMetaTable class (or subclass) that will be used for the getTables() enumerable. */
+  META_TABLE_CLASS("metaTableClass", Type.CLASS, CalciteMetaTable.class, false),
 
   /** Name of initial schema. */
   SCHEMA("schema", Type.STRING, null, false),

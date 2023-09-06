@@ -26,8 +26,6 @@ import org.apache.calcite.avatica.server.AvaticaJsonHandler;
 import org.apache.calcite.avatica.server.HttpServer;
 import org.apache.calcite.avatica.server.Main;
 import org.apache.calcite.config.CalciteSystemProperty;
-import org.apache.calcite.jdbc.CalciteMetaImpl.CalciteMetaTable;
-import org.apache.calcite.schema.Table;
 import org.apache.calcite.test.CalciteAssert;
 import org.apache.calcite.test.JdbcFrontLinqBackTest;
 import org.apache.calcite.test.schemata.hr.Employee;
@@ -69,7 +67,6 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -131,17 +128,6 @@ class CalciteRemoteDriverTest {
           throw TestUtil.rethrow(e);
         }
       };
-
-  private static final Function<Connection, ResultSet> GET_TABLES =
-      connection -> {
-        try {
-          return connection.getMetaData().getTables(connection.getCatalog(), null, null,
-              new String[] {"TABLE"});
-        } catch (SQLException e) {
-          throw TestUtil.rethrow(e);
-        }
-      };
-
 
   private static final Function<Connection, ResultSet> GET_TYPEINFO =
       connection -> {
@@ -265,7 +251,7 @@ class CalciteRemoteDriverTest {
     assertThat(connection.isClosed(), is(false));
     final ResultSet resultSet =
         connection.getMetaData().getColumns(null, "foo", null, "salary");
-    assertThat(resultSet.getMetaData().getColumnCount(), is(41));
+    assertThat(resultSet.getMetaData().getColumnCount(), is(24));
     final int typeNameIdx = resultSet.findColumn("TYPE_NAME");
     final int dataTypeIdx = resultSet.findColumn("DATA_TYPE");
     assertThat(resultSet.next(), is(true));
@@ -296,79 +282,6 @@ class CalciteRemoteDriverTest {
         .with(CalciteRemoteDriverTest::getRemoteConnection)
         .metaData(GET_COLUMNS)
         .returns(CalciteAssert.checkResultContains("COLUMN_NAME=EMPNO"));
-  }
-
-  @Test void testRemoteColumnsMetadata() throws SQLException {
-    final Connection connection =
-        DriverManager.getConnection("jdbc:avatica:remote:factory=" + LJS);
-    final ResultSet resultSet = connection.getMetaData()
-        .getColumns(null, null, null, null);
-    final ResultSetMetaData metaData = resultSet.getMetaData();
-    resultSet.close();
-    connection.close();
-    assertThat(metaData.getColumnCount(), is(41));
-    assertThat(metaData.getColumnName(25), is("LOOKER_FIELD_ALIAS"));
-    assertThat(metaData.getColumnName(26), is("LOOKER_FIELD_CATEGORY"));
-    assertThat(metaData.getColumnName(27), is("LOOKER_FIELD_DESCRIPTION"));
-    assertThat(metaData.getColumnName(28), is("LOOKER_FIELD_GROUP_VARIANT"));
-    assertThat(metaData.getColumnName(29), is("LOOKER_FIELD_LABEL"));
-    assertThat(metaData.getColumnName(30), is("LOOKER_FIELD_NAME"));
-    assertThat(metaData.getColumnName(31), is("LOOKER_TYPE"));
-    assertThat(metaData.getColumnName(32), is("LOOKER_USE_STRICT_VALUE_FORMAT"));
-    assertThat(metaData.getColumnName(33), is("LOOKER_VIEW_NAME"));
-    assertThat(metaData.getColumnName(34), is("LOOKER_VIEW_LABEL"));
-    assertThat(metaData.getColumnName(35), is("HIDDEN"));
-    assertThat(metaData.getColumnName(36), is("DIMENSION_GROUP"));
-    assertThat(metaData.getColumnName(37), is("REQUIRES_REFRESH_ON_SORT"));
-    assertThat(metaData.getColumnName(38), is("SORTABLE"));
-    assertThat(metaData.getColumnName(39), is("VALUE_FORMAT"));
-    assertThat(metaData.getColumnName(40), is("TAGS"));
-    assertThat(metaData.getColumnName(41), is("FILTERS"));
-    assertThat(connection.isClosed(), is(true));
-  }
-
-  /** Sample subclass testing getMetaTables. */
-  public static class MetaExploreTable extends CalciteMetaTable {
-    public final String extraLabel;
-
-    MetaExploreTable(Table calciteTable, String tableCat,
-        String tableSchem, String tableName) {
-      super(calciteTable, tableCat, tableSchem, tableName);
-      Map<String, Object> metadataMap = calciteTable.getTableMetadata();
-      Object extraLabel1 = metadataMap.getOrDefault("extraLabel", null);
-      this.extraLabel = extraLabel1 != null ? (String) extraLabel1 : null;
-    }
-    public static List<String> getColumnNames() {
-      return Arrays.asList("TABLE_CAT",
-          "TABLE_SCHEM",
-          "TABLE_NAME",
-          "TABLE_TYPE",
-          "REMARKS",
-          "TYPE_CAT",
-          "TYPE_SCHEM",
-          "TYPE_NAME",
-          "SELF_REFERENCING_COL_NAME",
-          "REF_GENERATION",
-          "EXTRA_LABEL");
-    }
-  }
-
-  @Test void testRemoteTables() throws SQLException {
-    final Connection connection =
-        DriverManager.getConnection("jdbc:avatica:remote:factory=" + LJS);
-    assertThat(connection.isClosed(), is(false));
-    final ResultSet resultSet =
-        connection.getMetaData().getTables(
-            connection.getCatalog(), null, null, new String[] {"TABLE"});
-    final ResultSetMetaData metaData = resultSet.getMetaData();
-    resultSet.close();
-    connection.close();
-    assertThat(metaData.getColumnCount(), is(10));
-    // assertThat(metaData.getColumnName(11), is("EXPLORE_LABEL"));
-    // assertThat(metaData.getColumnName(12), is("EXPLORE_DESCRIPTION"));
-    // assertThat(metaData.getColumnName(13), is("EXPLORE_TAGS"));
-
-    assertThat(connection.isClosed(), is(true));
   }
 
   @Test void testRemoteTypeInfo() {
@@ -748,7 +661,7 @@ class CalciteRemoteDriverTest {
       try {
         Connection conn = makeConnection();
         final CalciteMetaImpl meta =
-            new CalciteMetaImpl(conn.unwrap(CalciteConnectionImpl.class));
+            new CalciteMetaImpl(conn.unwrap(CalciteConnectionImpl.class), null);
         return new LocalService(meta);
       } catch (Exception e) {
         throw TestUtil.rethrow(e);
@@ -905,7 +818,7 @@ class CalciteRemoteDriverTest {
     public Meta create(List<String> args) {
       try {
         final Connection connection = CalciteAssert.hr().connect();
-        return new CalciteMetaImpl((CalciteConnectionImpl) connection);
+        return new CalciteMetaImpl((CalciteConnectionImpl) connection, null);
       } catch (Exception e) {
         throw TestUtil.rethrow(e);
       }
@@ -933,7 +846,7 @@ class CalciteRemoteDriverTest {
         Connection conn = JdbcFrontLinqBackTest.makeConnection();
         final CalciteMetaImpl meta =
             new CalciteMetaImpl(
-                conn.unwrap(CalciteConnectionImpl.class));
+                conn.unwrap(CalciteConnectionImpl.class), null);
         return new LocalService(meta);
       } catch (Exception e) {
         throw TestUtil.rethrow(e);

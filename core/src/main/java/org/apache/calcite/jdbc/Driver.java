@@ -212,8 +212,13 @@ public class Driver extends UnregisteredDriver {
   }
 
   @Override public Meta createMeta(AvaticaConnection connection) {
-    Class<?> classFromInfo = connection.getMetaTableClass();
-    Class<?> metaTableClass = classFromInfo != null ? classFromInfo : CalciteMetaTable.class;
+    Class<?> metaTableClass = CalciteMetaTable.class;
+    try {
+      CalciteConnectionImpl calciteConnection = connection.unwrap(CalciteConnectionImpl.class);
+      metaTableClass = calciteConnection.getMetaTableClass();
+    } catch (Exception e) {
+      // Default to using CalciteMetaTable
+    }
     return new CalciteMetaImpl((CalciteConnectionImpl) connection, metaTableClass);
   }
 

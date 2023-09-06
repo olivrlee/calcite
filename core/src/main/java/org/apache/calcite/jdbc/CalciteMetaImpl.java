@@ -78,7 +78,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +94,7 @@ public class CalciteMetaImpl extends MetaImpl {
   static final Driver DRIVER = new Driver();
   private final Class metaTableClass;
 
-  // @Deprecated // to be removed before 2.0
+  @Deprecated // to be removed before 2.0
   public CalciteMetaImpl(CalciteConnectionImpl connection) {
     this(connection, CalciteMetaTable.class);
   }
@@ -285,37 +284,25 @@ public class CalciteMetaImpl extends MetaImpl {
         .where(schemaMatcher)
         .selectMany(schema -> tables(schema, matcher(tableNamePattern)))
         .where(typeFilter);
-    String[] cNames;
+    String[] columnNames = getColumnNames(this.metaTableClass);
+    return createResultSet(tables,
+        this.metaTableClass,
+        columnNames);
+  }
+
+  /** The provided subclass needs to overload getColumnNames() with the expected columns in the
+   * enumerable.
+   * */
+  private String[] getColumnNames(Class<?> clazz) {
     try {
-      Method m = this.metaTableClass.getMethod("getColumnNames");
-      List<String> columnNames = (List<String>) m.invoke(null);
-      cNames = columnNames.toArray(new String[0]);
+      Method m = clazz.getMethod("getColumnNames");
+      String[] columnNames = (String[]) m.invoke(null);
+      return columnNames;
     } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
       throw new RuntimeException(e);
     }
-
-    return createResultSet(tables,
-        this.metaTableClass,
-        cNames);
   }
 
-  // // Looks at the identified tables and determines if an override for the MetaTable class
-  // // has been provided.
-  // private Pair<Class<?>, List<String>> determineClass(Iterator<MetaTable> tables) {
-  //   try {
-  //     while (tables.hasNext()) {
-  //       MetaTable t = tables.next();
-  //       CalciteMetaTable t1 = (CalciteMetaTable) t;
-  //       Class metaTableClass = t1.calciteTable.getMetaTableClass();
-  //       if (metaTableClass != CalciteMetaTable.class) {
-  //         return Pair.of(metaTableClass, t1.getAdditionalColumnNames());
-  //       }
-  //     }
-  //   } catch (Exception e) {
-  //
-  //   }
-  //   return Pair.of(MetaTable.class, new ArrayList<>());
-  // }
 
   @Override public MetaResultSet getTypeInfo(ConnectionHandle ch) {
     return createResultSet(allTypeInfo(),
@@ -432,7 +419,7 @@ public class CalciteMetaImpl extends MetaImpl {
             tables(schema, Functions.<String>truePredicate1()));
   }
 
-  /** If CalciteMetaImpl was created with a sublcass for CalciteMetaTable, tables() will return
+  /** If CalciteMetaImpl was created with a subclass for CalciteMetaTable, tables() will return
    * instances of the subclass instead of CalciteMetaTable.  */
   private MetaTable getMetaTables(Table table, String tableCatalog,
       String tableSchem, String name) {
@@ -515,9 +502,6 @@ public class CalciteMetaImpl extends MetaImpl {
 
   public Enumerable<MetaColumn> columns(final MetaTable table_) {
     final CalciteMetaTable table = (CalciteMetaTable) table_;
-    HashMap<String, HashMap<String, Object>> metadataMap =
-        (table.calciteTable.getFieldMetadata() != null)
-        ? table.calciteTable.getFieldMetadata() : new HashMap<>();
     final RelDataType rowType =
         table.calciteTable.getRowType(getConnection().typeFactory);
     return Linq4j.asEnumerable(rowType.getFieldList())
@@ -894,7 +878,7 @@ public class CalciteMetaImpl extends MetaImpl {
   public static class CalciteMetaTable extends MetaTable {
     private final Table calciteTable;
 
-    CalciteMetaTable(Table calciteTable, String tableCat,
+    public CalciteMetaTable(Table calciteTable, String tableCat,
         String tableSchem, String tableName) {
       super(tableCat, tableSchem, tableName,
           calciteTable.getJdbcTableType().jdbcName);
