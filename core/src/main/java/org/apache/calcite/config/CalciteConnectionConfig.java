@@ -111,5 +111,9 @@ public interface CalciteConnectionConfig extends ConnectionConfig {
   /** Returns the value of {@link CalciteConnectionProperty#TOPDOWN_OPT}. */
   boolean topDownOpt();
 
+  /** Returns the value of {@link CalciteConnectionProperty#META_TABLE_CLASS}. */
   Class<?> metaTableClass();
+
+  /** Returns the value of {@link CalciteConnectionProperty#META_COLUMN_CLASS}. */
+  Class<?> metaColumnClass();
 }

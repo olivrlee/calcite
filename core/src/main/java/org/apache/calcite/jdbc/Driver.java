@@ -25,6 +25,7 @@ import org.apache.calcite.avatica.DriverVersion;
 import org.apache.calcite.avatica.Handler;
 import org.apache.calcite.avatica.HandlerImpl;
 import org.apache.calcite.avatica.Meta;
+import org.apache.calcite.avatica.MetaImpl.MetaColumn;
 import org.apache.calcite.avatica.UnregisteredDriver;
 import org.apache.calcite.config.CalciteConnectionProperty;
 import org.apache.calcite.jdbc.CalciteMetaImpl.CalciteMetaTable;
@@ -212,14 +213,22 @@ public class Driver extends UnregisteredDriver {
   }
 
   @Override public Meta createMeta(AvaticaConnection connection) {
-    Class<?> metaTableClass = CalciteMetaTable.class;
+    Class<?> metaTableClass =
+        getMetaClass(connection, CalciteConnectionProperty.META_TABLE_CLASS,
+            CalciteMetaTable.class);
+    Class<?> metaColumnClass =
+        getMetaClass(connection, CalciteConnectionProperty.META_COLUMN_CLASS, MetaColumn.class);
+    return new CalciteMetaImpl((CalciteConnectionImpl) connection, metaTableClass, metaColumnClass);
+  }
+
+  private Class<?> getMetaClass(AvaticaConnection connection,
+      CalciteConnectionProperty connectionProperty, Class<?> defaultClass) {
     try {
       CalciteConnectionImpl calciteConnection = connection.unwrap(CalciteConnectionImpl.class);
-      metaTableClass = calciteConnection.getMetaTableClass();
-    } catch (Exception e) {
-      // Default to using CalciteMetaTable
+      return calciteConnection.getMetaClass(connectionProperty, defaultClass);
+    } catch (SQLException e) {
+      return CalciteMetaTable.class;
     }
-    return new CalciteMetaImpl((CalciteConnectionImpl) connection, metaTableClass);
   }
 
   /** Creates an internal connection. */

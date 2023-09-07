@@ -93,13 +93,15 @@ import static java.util.Objects.requireNonNull;
 public class CalciteMetaImpl extends MetaImpl {
   static final Driver DRIVER = new Driver();
   private final Class metaTableClass;
+  private final Class metaColumnClass;
 
   @Deprecated // to be removed before 2.0
   public CalciteMetaImpl(CalciteConnectionImpl connection) {
-    this(connection, CalciteMetaTable.class);
+    this(connection, CalciteMetaTable.class, MetaColumn.class);
   }
 
-  public CalciteMetaImpl(CalciteConnectionImpl connection, @Nullable Class<?> metaTableClass) {
+  public CalciteMetaImpl(CalciteConnectionImpl connection, @Nullable Class<?> metaTableClass,
+      @Nullable Class<?> metaColumnClass) {
     super(connection);
     this.connProps
         .setAutoCommit(false)
@@ -113,7 +115,12 @@ public class CalciteMetaImpl extends MetaImpl {
     } else {
       this.metaTableClass = CalciteMetaTable.class;
     }
-
+    if (metaColumnClass != null) {
+      assert MetaColumn.class.isAssignableFrom(metaColumnClass);
+      this.metaColumnClass = metaColumnClass;
+    } else {
+      this.metaColumnClass = MetaColumn.class;
+    }
   }
 
   static <T extends Named> Predicate1<T> namedMatcher(final Pat pattern) {
@@ -336,36 +343,14 @@ public class CalciteMetaImpl extends MetaImpl {
     final Predicate1<MetaSchema> schemaMatcher = namedMatcher(schemaPattern);
     final Predicate1<MetaColumn> columnMatcher =
         namedMatcher(columnNamePattern);
+    String[] columnNames = getColumnNames(this.metaColumnClass);
     return createResultSet(schemas(catalog)
             .where(schemaMatcher)
             .selectMany(schema -> tables(schema, tableNameMatcher))
             .selectMany(this::columns)
             .where(columnMatcher),
-        MetaColumn.class,
-        "TABLE_CAT",
-        "TABLE_SCHEM",
-        "TABLE_NAME",
-        "COLUMN_NAME",
-        "DATA_TYPE",
-        "TYPE_NAME",
-        "COLUMN_SIZE",
-        "BUFFER_LENGTH",
-        "DECIMAL_DIGITS",
-        "NUM_PREC_RADIX",
-        "NULLABLE",
-        "REMARKS",
-        "COLUMN_DEF",
-        "SQL_DATA_TYPE",
-        "SQL_DATETIME_SUB",
-        "CHAR_OCTET_LENGTH",
-        "ORDINAL_POSITION",
-        "IS_NULLABLE",
-        "SCOPE_CATALOG",
-        "SCOPE_SCHEMA",
-        "SCOPE_TABLE",
-        "SOURCE_DATA_TYPE",
-        "IS_AUTOINCREMENT",
-        "IS_GENERATEDCOLUMN");
+        this.metaColumnClass,
+        columnNames);
   }
 
   Enumerable<MetaCatalog> catalogs() {

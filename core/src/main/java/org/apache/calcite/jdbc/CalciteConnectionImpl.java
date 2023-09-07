@@ -33,7 +33,6 @@ import org.apache.calcite.avatica.remote.TypedValue;
 import org.apache.calcite.config.CalciteConnectionConfig;
 import org.apache.calcite.config.CalciteConnectionConfigImpl;
 import org.apache.calcite.config.CalciteConnectionProperty;
-import org.apache.calcite.jdbc.CalciteMetaImpl.CalciteMetaTable;
 import org.apache.calcite.jdbc.CalcitePrepare.Context;
 import org.apache.calcite.linq4j.BaseQueryable;
 import org.apache.calcite.linq4j.Enumerable;
@@ -192,19 +191,20 @@ abstract class CalciteConnectionImpl
     return super.unwrap(iface);
   }
 
-  /** If a subclass of CalciteMetaTable is passed in for
-   * {@code CalciteConnectionProperty.META_TABLE_CLASS} when connecting, calls to getTables()
-   * and getColumns() will create an enumerable using the CalciteMetaTable subclass, otherwise it
-   * will default to creating CalciteMetaTable.
-   * */
-  public Class<?> getMetaTableClass() {
+  /** If a subclass is passed in for CalciteMetaTable or MetaColumn for
+   * {@code CalciteConnectionProperty.META_TABLE_CLASS} or
+   * {@code CalciteConnectionProperty.META_COLUMN_CLASS} when connecting, calls to getTables()
+   * or getColumns() will create an enumerable using the subclass, otherwise it
+   * will default to creating CaliteMetaTable / MetaColumn. */
+  public Class<?> getMetaClass(CalciteConnectionProperty connectionProperty,
+      Class<?> defaultClass) {
     String className =
-        (String) info.getOrDefault(CalciteConnectionProperty.META_TABLE_CLASS.camelName(),
-            CalciteMetaTable.class.getName());
+        (String) info.getOrDefault(connectionProperty.camelName(),
+            defaultClass.getName());
     try {
       return Class.forName(className);
     } catch (ClassNotFoundException e) {
-      return CalciteMetaTable.class;
+      return defaultClass;
     }
   }
 

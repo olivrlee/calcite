@@ -17,6 +17,7 @@
 package org.apache.calcite.config;
 
 import org.apache.calcite.avatica.ConnectionProperty;
+import org.apache.calcite.avatica.MetaImpl.MetaColumn;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.avatica.util.Quoting;
 import org.apache.calcite.jdbc.CalciteMetaImpl.CalciteMetaTable;
@@ -109,6 +110,9 @@ public enum CalciteConnectionProperty implements ConnectionProperty {
 
   /** The CalciteMetaTable class (or subclass) that will be used for the getTables() enumerable. */
   META_TABLE_CLASS("metaTableClass", Type.CLASS, CalciteMetaTable.class, false),
+
+  /** The MetaColumn class (or subclass) that will be used for the getColumns() enumerable. */
+  META_COLUMN_CLASS("metaColumnClass", Type.CLASS, MetaColumn.class, false),
 
   /** Name of initial schema. */
   SCHEMA("schema", Type.STRING, null, false),

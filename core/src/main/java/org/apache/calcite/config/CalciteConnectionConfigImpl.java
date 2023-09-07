@@ -217,4 +217,8 @@ public class CalciteConnectionConfigImpl extends ConnectionConfigImpl
   @Override public Class<?> metaTableClass() {
     return CalciteConnectionProperty.META_TABLE_CLASS.wrap(properties).getClass();
   }
+
+  @Override public Class<?> metaColumnClass() {
+    return CalciteConnectionProperty.META_COLUMN_CLASS.wrap(properties).getClass();
+  }
 }
