@@ -24,7 +24,7 @@
     <function group='system' name='TIME1899' return-type='datetime'>
       <!-- This is invoked because Tableau has no concept of "time" values (just dates and datetimes).
            When we tell it that there's a time as part of our schema, it's coerced to datetime by setting the date to Tableau's epoch (1899-12-30). -->
-      <formula>TIMESTAMP(DATETIME(DATE(1899, 12, 30), CAST((%1) AS TIME)))</formula>
+      <formula>DATETIME(DATE(1899, 12, 30), CAST((%1) AS TIME))</formula>
       <argument type='datetime' />
     </function>
     <function group='numeric' name='ABS' return-type='real'>
@@ -482,8 +482,8 @@
       <argument type='int' />
     </function>
     <function group='cast' name='DATE' return-type='date'>
-      <!-- First cast to TIMESTAMP, then DATE, in case the string has a time component. -->
-      <formula>CAST(CAST((%1) AS TIMESTAMP) AS DATE)</formula>
+      <!-- First cast to DATETIME, then DATE, in case the string has a time component. -->
+      <formula>CAST(CAST((%1) AS DATETIME) AS DATE)</formula>
       <argument type='str' />
     </function>
     <function group='cast' name='DATE' return-type='date'>
@@ -494,26 +494,25 @@
       <formula>CAST((%1) AS DATE)</formula>
       <argument type='date' />
     </function>
-    <!-- I used TIMESTAMP instead of DATETIME to represent Tableau's datetime. TODO: Revisit this (look into timezone semantics). -->
     <function group='cast' name='DATETIME' return-type='datetime'>
       <!-- Semantics inferred from the example dialect. -->
-      <formula>TIMESTAMP_ADD(TIMESTAMP(DATE(1900, 1, 1)), INTERVAL (CAST(TRUNC((%1) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
+      <formula>DATETIME_ADD(DATETIME(1900, 1, 1, 0, 0, 0), INTERVAL (CAST(TRUNC((%1) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
       <argument type='real' />
     </function>
     <function group='cast' name='DATETIME' return-type='datetime'>
-      <formula>TIMESTAMP(DATE_ADD(DATE(1900, 1, 1), INTERVAL (%1) DAY))</formula>
+      <formula>DATETIME(DATE_ADD(DATE(1900, 1, 1), INTERVAL (%1) DAY))</formula>
       <argument type='int' />
     </function>
     <function group='cast' name='DATETIME' return-type='datetime'>
-      <formula>CAST((%1) AS TIMESTAMP)</formula>
+      <formula>CAST((%1) AS DATETIME)</formula>
       <argument type='str' />
     </function>
     <function group='cast' name='DATETIME' return-type='datetime'>
-      <formula>CAST((%1) AS TIMESTAMP)</formula>
+      <formula>CAST((%1) AS DATETIME)</formula>
       <argument type='datetime' />
     </function>
     <function group='cast' name='DATETIME' return-type='datetime'>
-      <formula>TIMESTAMP(%1)</formula>
+      <formula>DATETIME(%1)</formula>
       <argument type='date' />
     </function>
     <function group='cast' name='FLOAT' return-type='real'>
@@ -533,7 +532,7 @@
       <argument type='str' />
     </function>
     <function group='cast' name='FLOAT' return-type='real'>
-      <formula>(CAST(TIMESTAMP_DIFF((%1), TIMESTAMP(DATE(1900, 1, 1)), SECOND) AS FLOAT64) / (60.0 * 60.0 * 24.0))</formula>
+      <formula>(CAST(DATETIME_DIFF((%1), DATETIME(1900, 1, 1, 0, 0, 0), SECOND) AS FLOAT64) / (60.0 * 60.0 * 24.0))</formula>
       <argument type='datetime' />
     </function>
     <function group='cast' name='FLOAT' return-type='real'>
@@ -561,7 +560,7 @@
       <argument type='str' />
     </function>
     <function group='cast' name='INT' return-type='int'>
-      <formula>CAST(TRUNC(CAST(TIMESTAMP_DIFF((%1), TIMESTAMP(DATE(1900, 1, 1)), SECOND) AS FLOAT64) / (60.0 * 60.0 * 24.0)) AS INTEGER)</formula>
+      <formula>CAST(TRUNC(CAST(DATETIME_DIFF((%1), DATETIME(1900, 1, 1, 0, 0, 0), SECOND) AS FLOAT64) / (60.0 * 60.0 * 24.0)) AS INTEGER)</formula>
       <argument type='datetime' />
     </function>
     <function group='cast' name='INT' return-type='int'>
@@ -575,22 +574,22 @@
       <argument type='int' />
     </function>
     <function group='cast' name='MAKEDATETIME' return-type='datetime'>
-      <formula>TIMESTAMP(DATETIME(CAST((%1) AS DATE), TIME(%2)))</formula>
+      <formula>DATETIME(CAST((%1) AS DATE), TIME(%2))</formula>
       <argument type='str' />
       <argument type='datetime' />
     </function>
     <function group='cast' name='MAKEDATETIME' return-type='datetime'>
-      <formula>TIMESTAMP(DATETIME(DATE(%1), TIME(%2)))</formula>
+      <formula>DATETIME(DATE(%1), TIME(%2))</formula>
       <argument type='datetime' />
       <argument type='datetime' />
     </function>
     <function group='cast' name='MAKEDATETIME' return-type='datetime'>
-      <formula>TIMESTAMP(DATETIME((%1), TIME(%2)))</formula>
+      <formula>DATETIME((%1), TIME(%2))</formula>
       <argument type='date' />
       <argument type='datetime' />
     </function>
     <function group='cast' name='MAKETIME' return-type='datetime'>
-      <formula>TIMESTAMP(DATETIME(DATE(1900, 1, 1), TIME((%1), (%2), (%3))))</formula>
+      <formula>DATETIME(1900, 1, 1, (%1), (%2), (%3))</formula>
       <argument type='int' />
       <argument type='int' />
       <argument type='int' />
@@ -650,12 +649,12 @@
       <argument type='datetime' />
     </function>
     <function group='logical' name='IFNULL' return-type='datetime'>
-      <formula>COALESCE((%1), TIMESTAMP(%2))</formula>
+      <formula>COALESCE((%1), DATETIME(%2))</formula>
       <argument type='datetime' />
       <argument type='date' />
     </function>
     <function group='logical' name='IFNULL' return-type='datetime'>
-      <formula>COALESCE(TIMESTAMP(%1), (%2))</formula>
+      <formula>COALESCE(DATETIME(%1), (%2))</formula>
       <argument type='date' />
       <argument type='datetime' />
     </function>
@@ -1006,12 +1005,12 @@
       <argument type='str' />
     </function>
     <function group='operator' name='!=' return-type='bool'>
-      <formula>(CAST((%1) AS TIMESTAMP) != (%2))</formula>
+      <formula>(CAST((%1) AS DATETIME) != (%2))</formula>
       <argument type='str' />
       <argument type='datetime' />
     </function>
     <function group='operator' name='!=' return-type='bool'>
-      <formula>((%1) != CAST((%2) AS TIMESTAMP))</formula>
+      <formula>((%1) != CAST((%2) AS DATETIME))</formula>
       <argument type='datetime' />
       <argument type='str' />
     </function>
@@ -1087,19 +1086,19 @@
     </function>
     <function group='operator' name='+' return-type='datetime'>
       <!-- TODO: Expected semantics unclear. Currently interpreting the real number as "days". -->
-      <formula>TIMESTAMP_ADD((%1), INTERVAL (CAST(TRUNC((%2) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
+      <formula>DATETIME_ADD((%1), INTERVAL (CAST(TRUNC((%2) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
       <argument type='datetime' />
       <argument type='real' />
     </function>
     <function group='operator' name='+' return-type='datetime'>
       <!-- TODO: Expected semantics unclear. Currently interpreting the integer as "days". -->
-      <formula>TIMESTAMP_ADD((%1), INTERVAL (%2) DAY)</formula>
+      <formula>DATETIME_ADD((%1), INTERVAL (%2) DAY)</formula>
       <argument type='datetime' />
       <argument type='int' />
     </function>
     <function group='operator' name='+' return-type='datetime'>
       <!-- TODO: Expected semantics unclear. Currently interpreting the real number as "days". -->
-      <formula>TIMESTAMP_ADD(TIMESTAMP(%1), INTERVAL (CAST(TRUNC((%2) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
+      <formula>DATETIME_ADD(DATETIME(%1), INTERVAL (CAST(TRUNC((%2) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
       <argument type='date' />
       <argument type='real' />
     </function>
@@ -1125,22 +1124,22 @@
       <argument type='real' />
     </function>
     <function group='operator' name='-' return-type='real'>
-      <formula>(TIMESTAMP_DIFF((%1), (%2), SECOND) / (60.0 * 60.0 * 24.0))</formula>
+      <formula>(DATETIME_DIFF((%1), (%2), SECOND) / (60.0 * 60.0 * 24.0))</formula>
       <argument type='datetime' />
       <argument type='datetime' />
     </function>
     <function group='operator' name='-' return-type='real'>
-      <formula>(TIMESTAMP_DIFF((%1), TIMESTAMP(%2), SECOND) / (60.0 * 60.0 * 24.0))</formula>
+      <formula>(DATETIME_DIFF((%1), DATETIME(%2), SECOND) / (60.0 * 60.0 * 24.0))</formula>
       <argument type='datetime' />
       <argument type='date' />
     </function>
     <function group='operator' name='-' return-type='real'>
-      <formula>(TIMESTAMP_DIFF(TIMESTAMP(%1), (%2), SECOND) / (60.0 * 60.0 * 24.0))</formula>
+      <formula>(DATETIME_DIFF(DATETIME(%1), (%2), SECOND) / (60.0 * 60.0 * 24.0))</formula>
       <argument type='date' />
       <argument type='datetime' />
     </function>
     <function group='operator' name='-' return-type='real'>
-      <formula>(TIMESTAMP_DIFF(TIMESTAMP(%1), TIMESTAMP(%2), SECOND) / (60.0 * 60.0 * 24.0))</formula>
+      <formula>(DATETIME_DIFF(DATETIME(%1), DATETIME(%2), SECOND) / (60.0 * 60.0 * 24.0))</formula>
       <argument type='date' />
       <argument type='date' />
     </function>
@@ -1159,22 +1158,22 @@
       <argument type='date' />
     </function>
     <function group='operator' name='-' return-type='datetime'>
-      <formula>TIMESTAMP_SUB((%1), INTERVAL (CAST(TRUNC((%2) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
+      <formula>DATETIME_SUB((%1), INTERVAL (CAST(TRUNC((%2) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
       <argument type='datetime' />
       <argument type='real' />
     </function>
     <function group='operator' name='-' return-type='datetime'>
-      <formula>TIMESTAMP_SUB((%1), INTERVAL ((%2) * (60 * 60 * 24)) SECOND)</formula>
+      <formula>DATETIME_SUB((%1), INTERVAL ((%2) * (60 * 60 * 24)) SECOND)</formula>
       <argument type='datetime' />
       <argument type='int' />
     </function>
     <function group='operator' name='-' return-type='datetime'>
-      <formula>TIMESTAMP_SUB(TIMESTAMP(%1), INTERVAL (CAST(TRUNC((%2) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
+      <formula>DATETIME_SUB(DATETIME(%1), INTERVAL (CAST(TRUNC((%2) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
       <argument type='date' />
       <argument type='real' />
     </function>
     <function group='operator' name='-' return-type='date'>
-      <formula>DATE(TIMESTAMP_SUB(TIMESTAMP(%1), INTERVAL (CAST(TRUNC((%2) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND))</formula>
+      <formula>DATE(DATETIME_SUB(DATETIME(%1), INTERVAL (CAST(TRUNC((%2) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND))</formula>
       <argument type='date' />
       <argument type='real' />
     </function>
@@ -1214,12 +1213,12 @@
       <argument type='str' />
     </function>
     <function group='operator' name='&lt;' return-type='bool'>
-      <formula>(TIMESTAMP(%1) &lt; (%2))</formula>
+      <formula>(DATETIME(%1) &lt; (%2))</formula>
       <argument type='str' />
       <argument type='datetime' />
     </function>
     <function group='operator' name='&lt;' return-type='bool'>
-      <formula>((%1) &lt; TIMESTAMP(%2))</formula>
+      <formula>((%1) &lt; DATETIME(%2))</formula>
       <argument type='datetime' />
       <argument type='str' />
     </function>
@@ -1229,12 +1228,12 @@
       <argument type='datetime' />
     </function>
     <function group='operator' name='&lt;' return-type='bool'>
-      <formula>((%1) &lt; TIMESTAMP(%2))</formula>
+      <formula>((%1) &lt; DATETIME(%2))</formula>
       <argument type='datetime' />
       <argument type='date' />
     </function>
     <function group='operator' name='&lt;' return-type='bool'>
-      <formula>(TIMESTAMP(%1) &lt; (%2))</formula>
+      <formula>(DATETIME(%1) &lt; (%2))</formula>
       <argument type='date' />
       <argument type='datetime' />
     </function>
@@ -1254,12 +1253,12 @@
       <argument type='str' />
     </function>
     <function group='operator' name='&lt;=' return-type='bool'>
-      <formula>(TIMESTAMP(%1) &lt;= (%2))</formula>
+      <formula>(DATETIME(%1) &lt;= (%2))</formula>
       <argument type='str' />
       <argument type='datetime' />
     </function>
     <function group='operator' name='&lt;=' return-type='bool'>
-      <formula>((%1) &lt;= TIMESTAMP(%2))</formula>
+      <formula>((%1) &lt;= DATETIME(%2))</formula>
       <argument type='datetime' />
       <argument type='str' />
     </function>
@@ -1269,12 +1268,12 @@
       <argument type='datetime' />
     </function>
     <function group='operator' name='&lt;=' return-type='bool'>
-      <formula>((%1) &lt;= TIMESTAMP(%2))</formula>
+      <formula>((%1) &lt;= DATETIME(%2))</formula>
       <argument type='datetime' />
       <argument type='date' />
     </function>
     <function group='operator' name='&lt;=' return-type='bool'>
-      <formula>(TIMESTAMP(%1) &lt;= (%2))</formula>
+      <formula>(DATETIME(%1) &lt;= (%2))</formula>
       <argument type='date' />
       <argument type='datetime' />
     </function>
@@ -1309,12 +1308,12 @@
       <argument type='str' />
     </function>
     <function group='operator' name='==' return-type='bool'>
-      <formula>(TIMESTAMP(%1) = (%2))</formula>
+      <formula>(DATETIME(%1) = (%2))</formula>
       <argument type='str' />
       <argument type='datetime' />
     </function>
     <function group='operator' name='==' return-type='bool'>
-      <formula>((%1) = TIMESTAMP(%2))</formula>
+      <formula>((%1) = DATETIME(%2))</formula>
       <argument type='datetime' />
       <argument type='str' />
     </function>
@@ -1325,13 +1324,13 @@
     </function>
     <function group='operator' name='==' return-type='bool'>
       <!-- TODO: Expected semantics unclear. Most timestamps would have no equal date. -->
-      <formula>((%1) = TIMESTAMP(%2))</formula>
+      <formula>((%1) = DATETIME(%2))</formula>
       <argument type='datetime' />
       <argument type='date' />
     </function>
     <function group='operator' name='==' return-type='bool'>
       <!-- TODO: Expected semantics unclear. Most timestamps would have no equal date. -->
-      <formula>(TIMESTAMP(%1) = (%2))</formula>
+      <formula>(DATETIME(%1) = (%2))</formula>
       <argument type='date' />
       <argument type='datetime' />
     </function>
@@ -1351,12 +1350,12 @@
       <argument type='str' />
     </function>
     <function group='operator' name='&gt;' return-type='bool'>
-      <formula>(TIMESTAMP(%1) &gt; (%2))</formula>
+      <formula>(DATETIME(%1) &gt; (%2))</formula>
       <argument type='str' />
       <argument type='datetime' />
     </function>
     <function group='operator' name='&gt;' return-type='bool'>
-      <formula>((%1) &gt; TIMESTAMP(%2))</formula>
+      <formula>((%1) &gt; DATETIME(%2))</formula>
       <argument type='datetime' />
       <argument type='str' />
     </function>
@@ -1366,12 +1365,12 @@
       <argument type='datetime' />
     </function>
     <function group='operator' name='&gt;' return-type='bool'>
-      <formula>((%1) &gt; TIMESTAMP(%2))</formula>
+      <formula>((%1) &gt; DATETIME(%2))</formula>
       <argument type='datetime' />
       <argument type='date' />
     </function>
     <function group='operator' name='&gt;' return-type='bool'>
-      <formula>(TIMESTAMP(%1) &gt; (%2))</formula>
+      <formula>(DATETIME(%1) &gt; (%2))</formula>
       <argument type='date' />
       <argument type='datetime' />
     </function>
@@ -1391,12 +1390,12 @@
       <argument type='str' />
     </function>
     <function group='operator' name='&gt;=' return-type='bool'>
-      <formula>(TIMESTAMP(%1) &gt;= (%2))</formula>
+      <formula>(DATETIME(%1) &gt;= (%2))</formula>
       <argument type='str' />
       <argument type='datetime' />
     </function>
     <function group='operator' name='&gt;=' return-type='bool'>
-      <formula>((%1) &gt;= TIMESTAMP(%2))</formula>
+      <formula>((%1) &gt;= DATETIME(%2))</formula>
       <argument type='datetime' />
       <argument type='str' />
     </function>
@@ -1406,12 +1405,12 @@
       <argument type='datetime' />
     </function>
     <function group='operator' name='&gt;=' return-type='bool'>
-      <formula>((%1) &gt;= TIMESTAMP(%2))</formula>
+      <formula>((%1) &gt;= DATETIME(%2))</formula>
       <argument type='datetime' />
       <argument type='date' />
     </function>
     <function group='operator' name='&gt;=' return-type='bool'>
-      <formula>(TIMESTAMP(%1) &gt;= (%2))</formula>
+      <formula>(DATETIME(%1) &gt;= (%2))</formula>
       <argument type='date' />
       <argument type='datetime' />
     </function>
@@ -1489,17 +1488,17 @@
       <argument type='date' />
     </function>
     <function group='date' name='NOW' return-type='datetime'>
-      <formula>CURRENT_TIMESTAMP()</formula>
+      <formula>CURRENT_DATETIME()</formula>
     </function>
     <function group='date' name='TIMESTAMP_TO_USEC' return-type='int'>
-      <formula>UNIX_SECONDS(%1)</formula>
+      <formula>UNIX_SECONDS(TIMESTAMP(%1))</formula>
       <argument type='datetime' />
     </function>
     <function group='date' name='TODAY' return-type='date'>
       <formula>CURRENT_DATE()</formula>
     </function>
     <function group='date' name='USEC_TO_TIMESTAMP' return-type='datetime'>
-      <formula>TIMESTAMP_SECONDS(%1)</formula>
+      <formula>DATETIME(TIMESTAMP_SECONDS(%1))</formula>
       <argument type='int' />
     </function>
     <function group='date' name='YEAR' return-type='int'>
@@ -1517,43 +1516,41 @@
       will use the generic (no part attribute) formula.
     -->
     <date-function name='DATEADD' return-type='datetime'>
-      <formula>TIMESTAMP_ADD((%3), INTERVAL (%2) %1)</formula>
-      <!-- TODO: `TIMESTAMP`'s inability to add years may justify switching from `TIMESTAMP` to `DATETIME` in general.
-                 Adding 365 days is not the same due to leap years etc. -->
-      <formula part='year'>TIMESTAMP(DATETIME_ADD(DATETIME(%3), INTERVAL (%2) YEAR))</formula>
-      <formula part='quarter'>TIMESTAMP(DATETIME_ADD(DATETIME(%3), INTERVAL (%2) QUARTER))</formula>
-      <formula part='month'>TIMESTAMP(DATETIME_ADD(DATETIME(%3), INTERVAL (%2) MONTH))</formula>
-      <formula part='dayofyear'>TIMESTAMP(DATETIME_ADD(DATETIME(%3), INTERVAL (%2) DAY))</formula>
-      <formula part='day'>TIMESTAMP_ADD((%3), INTERVAL (%2) DAY)</formula>
+      <formula>DATETIME_ADD((%3), INTERVAL (%2) %1)</formula>
+      <formula part='year'>DATETIME_ADD((%3), INTERVAL (%2) YEAR)</formula>
+      <formula part='quarter'>DATETIME_ADD((%3), INTERVAL (%2) QUARTER)</formula>
+      <formula part='month'>DATETIME_ADD((%3), INTERVAL (%2) MONTH)</formula>
+      <formula part='dayofyear'>DATETIME_ADD((%3), INTERVAL (%2) DAY)</formula>
+      <formula part='day'>DATETIME_ADD((%3), INTERVAL (%2) DAY)</formula>
       <!-- TODO: Expected semantics unclear. This is based off the example dialect. -->
-      <formula part='weekday'>TIMESTAMP(DATETIME_ADD(DATETIME(%3), INTERVAL (%2) DAY))</formula>
-      <formula part='week'>TIMESTAMP(DATETIME_ADD(DATETIME(%3), INTERVAL (%2) WEEK))</formula>
-      <formula part='hour'>TIMESTAMP_ADD((%3), INTERVAL (%2) HOUR)</formula>
-      <formula part='minute'>TIMESTAMP_ADD((%3), INTERVAL (%2) MINUTE)</formula>
-      <formula part='second'>TIMESTAMP_ADD((%3), INTERVAL (%2) SECOND)</formula>
+      <formula part='weekday'>DATETIME_ADD((%3), INTERVAL (%2) DAY)</formula>
+      <formula part='week'>DATETIME_ADD((%3), INTERVAL (%2) WEEK)</formula>
+      <formula part='hour'>DATETIME_ADD((%3), INTERVAL (%2) HOUR)</formula>
+      <formula part='minute'>DATETIME_ADD((%3), INTERVAL (%2) MINUTE)</formula>
+      <formula part='second'>DATETIME_ADD((%3), INTERVAL (%2) SECOND)</formula>
       <argument type='localstr' />
       <argument type='int' />
       <argument type='datetime' />
     </date-function>
     <date-function name='DATEDIFF' return-type='int'>
-      <formula part='year'>DATETIME_DIFF(DATETIME(%2), DATETIME(%3), YEAR)</formula>
-      <formula part='quarter'>DATETIME_DIFF(DATETIME(%2), DATETIME(%3), QUARTER)</formula>
-      <formula part='month'>DATETIME_DIFF(DATETIME(%2), DATETIME(%3), MONTH)</formula>
-      <formula part='dayofyear'>DATETIME_DIFF(DATETIME(%2), DATETIME(%3), DAY)</formula>
-      <formula part='day'>TIMESTAMP_DIFF((%2), (%3), DAY)</formula>
+      <formula>DATETIME_DIFF((%2), (%3), %1)</formula>
+      <formula part='year'>DATETIME_DIFF((%2), (%3), YEAR)</formula>
+      <formula part='quarter'>DATETIME_DIFF((%2), (%3), QUARTER)</formula>
+      <formula part='month'>DATETIME_DIFF((%2), (%3), MONTH)</formula>
+      <formula part='dayofyear'>DATETIME_DIFF((%2), (%3), DAY)</formula>
+      <formula part='day'>DATETIME_DIFF((%2), (%3), DAY)</formula>
       <!-- TODO: Expected semantics unclear. This is based off the example dialect. -->
-      <formula part='weekday'>DATETIME_DIFF(DATETIME(%2), DATETIME(%3), DAY)</formula>
-      <formula part='week'>DATETIME_DIFF(DATETIME(%2), DATETIME(%3), WEEK)</formula>
-      <formula part='hour'>TIMESTAMP_DIFF((%2), (%3), HOUR)</formula>
-      <formula part='minute'>TIMESTAMP_DIFF((%2), (%3), MINUTE)</formula>
-      <formula part='second'>TIMESTAMP_DIFF((%2), (%3), SECOND)</formula>
+      <formula part='weekday'>DATETIME_DIFF((%2), (%3), DAY)</formula>
+      <formula part='week'>DATETIME_DIFF((%2), (%3), WEEK)</formula>
+      <formula part='hour'>DATETIME_DIFF((%2), (%3), HOUR)</formula>
+      <formula part='minute'>DATETIME_DIFF((%2), (%3), MINUTE)</formula>
+      <formula part='second'>DATETIME_DIFF((%2), (%3), SECOND)</formula>
       <argument type='localstr' />
       <argument type='datetime' />
       <argument type='datetime' />
     </date-function>
     <date-function name='DATEDIFF' return-type='int'>
-      <!-- TODO: This is invalid BQ dialect, but I have no idea what the semantics should be. -->
-      <formula part='week'>DATEDIFF(week,%2,%3)</formula>
+      <formula part='week'>DATETIME_DIFF((%2), (%3), WEEK(%4))</formula>
       <argument type='localstr' />
       <argument type='datetime' />
       <argument type='datetime' />
@@ -1580,7 +1577,7 @@
       <argument type='localstr' />
     </date-function>
     <date-function name='DATEPARSE' return-type='datetime'>
-      <formula>PARSE_TIMESTAMP((%1), (%2))</formula>
+      <formula>PARSE_DATETIME((%1), (%2))</formula>
       <argument type='localstr' />
       <argument type='str' />
     </date-function>
@@ -1626,22 +1623,22 @@
       <argument type='localstr' />
     </date-function>
     <date-function name='DATETRUNC' return-type='datetime'>
-      <formula>TIMESTAMP_TRUNC(CAST((%2) AS TIMESTAMP), %1)</formula>
-      <formula part='year'>TIMESTAMP_TRUNC(CAST((%2) AS TIMESTAMP), YEAR)</formula>
-      <formula part='quarter'>TIMESTAMP_TRUNC(CAST((%2) AS TIMESTAMP), QUARTER)</formula>
-      <formula part='month'>TIMESTAMP_TRUNC(CAST((%2) AS TIMESTAMP), MONTH)</formula>
-      <formula part='dayofyear'>TIMESTAMP_TRUNC(CAST((%2) AS TIMESTAMP), DAY)</formula>
-      <formula part='day'>TIMESTAMP_TRUNC(CAST((%2) AS TIMESTAMP), DAY)</formula>
-      <formula part='weekday'>TIMESTAMP_TRUNC(CAST((%2) AS TIMESTAMP), DAY)</formula>
-      <formula part='week'>TIMESTAMP_TRUNC(CAST((%2) AS TIMESTAMP), WEEK)</formula>
-      <formula part='hour'>TIMESTAMP_TRUNC(CAST((%2) AS TIMESTAMP), HOUR)</formula>
-      <formula part='minute'>TIMESTAMP_TRUNC(CAST((%2) AS TIMESTAMP), MINUTE)</formula>
-      <formula part='second'>TIMESTAMP_TRUNC(CAST((%2) AS TIMESTAMP), SECOND)</formula>
+      <formula>DATETIME_TRUNC((%2), %1)</formula>
+      <formula part='year'>DATETIME_TRUNC((%2), YEAR)</formula>
+      <formula part='quarter'>DATETIME_TRUNC((%2), QUARTER)</formula>
+      <formula part='month'>DATETIME_TRUNC((%2), MONTH)</formula>
+      <formula part='dayofyear'>DATETIME_TRUNC((%2), DAY)</formula>
+      <formula part='day'>DATETIME_TRUNC((%2), DAY)</formula>
+      <formula part='weekday'>DATETIME_TRUNC((%2), DAY)</formula>
+      <formula part='week'>DATETIME_TRUNC((%2), WEEK)</formula>
+      <formula part='hour'>DATETIME_TRUNC((%2), HOUR)</formula>
+      <formula part='minute'>DATETIME_TRUNC((%2), MINUTE)</formula>
+      <formula part='second'>DATETIME_TRUNC((%2), SECOND)</formula>
       <argument type='localstr' />
       <argument type='datetime' />
     </date-function>
     <date-function name='DATETRUNC' return-type='datetime'>
-      <formula part='week'>TIMESTAMP_TRUNC(CAST((%2) AS TIMESTAMP), WEEK(%3))</formula>
+      <formula part='week'>DATETIME_TRUNC((%2), WEEK(%3))</formula>
       <argument type='localstr' />
       <argument type='datetime' />
       <argument type='localstr' />
@@ -1769,7 +1766,7 @@
       </date-part-group>
     </date-parts>
     <format-date-literal formula="(DATE '%1')"  format='yyyy-MM-dd' />
-    <format-datetime-literal formula="(TIMESTAMP '%1')" format='yyyy-MM-dd HH:mm:ss.SSS' />
+    <format-datetime-literal formula="(DATETIME '%1')" format='yyyy-MM-dd HH:mm:ss.SSS' />
     <format-false literal='FALSE' predicate='FALSE' /> <!-- Requires 2020.3 or newer -->
     <format-is-distinct value='Keyword' />
     <format-order-by value='DirectionOnly' />
