@@ -225,8 +225,7 @@
       <argument type='int' />
     </function>
     <function group='numeric' name='ROUND' return-type='int'>
-      <!-- BQ always returns a real number for `ROUND`. -->
-      <formula>CAST(ROUND(%1) AS INTEGER)</formula>
+      <formula>ROUND(%1)</formula>
       <argument type='real' />
     </function>
     <function group='numeric' name='SIGN' return-type='int'>
@@ -239,8 +238,7 @@
       <argument type='real' />
     </function>
     <function group='numeric' name='SQRT' return-type='real'>
-      <!-- BQ throws an error on negative numbers, instead we want NULL. -->
-      <formula>SQRT(IF(%1 < 0, NULL, %1))</formula>
+      <formula>IF((%1) < 0, NULL, SQRT(%1))</formula>
       <argument type='real' />
     </function>
     <function group='numeric' name='SQUARE' return-type='real'>
