@@ -472,11 +472,11 @@
     </function>
     <function group='cast' name='DATE' return-type='date'>
       <!-- Semantics inferred from the example dialect. -->
-      <formula>DATE_ADD(DATE(1900, 1, 1), INTERVAL (CAST(TRUNC(%1) AS INTEGER)) DAY)</formula>
+      <formula>DATE_ADD(DATE(1899, 12, 30), INTERVAL (CAST(CEIL(%1) AS INTEGER)) DAY)</formula>
       <argument type='real' />
     </function>
     <function group='cast' name='DATE' return-type='date'>
-      <formula>DATE_ADD(DATE(1900, 1, 1), INTERVAL (%1) DAY)</formula>
+      <formula>DATE_ADD(DATE(1899, 12, 30), INTERVAL (%1) DAY)</formula>
       <argument type='int' />
     </function>
     <function group='cast' name='DATE' return-type='date'>
@@ -494,11 +494,11 @@
     </function>
     <function group='cast' name='DATETIME' return-type='datetime'>
       <!-- Semantics inferred from the example dialect. -->
-      <formula>DATETIME_ADD(DATETIME(1900, 1, 1, 0, 0, 0), INTERVAL (CAST(TRUNC((%1) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
+      <formula>DATETIME_ADD(DATETIME(1899, 12, 30, 0, 0, 0), INTERVAL (CAST(CEIL((%1) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
       <argument type='real' />
     </function>
     <function group='cast' name='DATETIME' return-type='datetime'>
-      <formula>DATETIME(DATE_ADD(DATE(1900, 1, 1), INTERVAL (%1) DAY))</formula>
+      <formula>DATETIME(DATE_ADD(DATE(1899, 12, 30), INTERVAL (%1) DAY))</formula>
       <argument type='int' />
     </function>
     <function group='cast' name='DATETIME' return-type='datetime'>
@@ -530,11 +530,11 @@
       <argument type='str' />
     </function>
     <function group='cast' name='FLOAT' return-type='real'>
-      <formula>(CAST(DATETIME_DIFF((%1), DATETIME(1900, 1, 1, 0, 0, 0), SECOND) AS FLOAT64) / (60.0 * 60.0 * 24.0))</formula>
+      <formula>(CAST(DATETIME_DIFF((%1), DATETIME(1899, 12, 30, 0, 0, 0), SECOND) AS FLOAT64) / (60.0 * 60.0 * 24.0))</formula>
       <argument type='datetime' />
     </function>
     <function group='cast' name='FLOAT' return-type='real'>
-      <formula>CAST(DATE_DIFF((%1), DATE(1900, 1, 1), DAY) AS FLOAT64)</formula>
+      <formula>CAST(DATE_DIFF((%1), DATE(1899, 12, 30), DAY) AS FLOAT64)</formula>
       <argument type='date' />
     </function>
     <function group='cast' name='INT' return-type='int'>
@@ -558,11 +558,11 @@
       <argument type='str' />
     </function>
     <function group='cast' name='INT' return-type='int'>
-      <formula>CAST(TRUNC(CAST(DATETIME_DIFF((%1), DATETIME(1900, 1, 1, 0, 0, 0), SECOND) AS FLOAT64) / (60.0 * 60.0 * 24.0)) AS INTEGER)</formula>
+      <formula>CAST(TRUNC(CAST(DATETIME_DIFF((%1), DATETIME(1899, 12, 30, 0, 0, 0), SECOND) AS FLOAT64) / (60.0 * 60.0 * 24.0)) AS INTEGER)</formula>
       <argument type='datetime' />
     </function>
     <function group='cast' name='INT' return-type='int'>
-      <formula>DATE_DIFF((%1), DATE(1900, 1, 1), DAY)</formula>
+      <formula>DATE_DIFF((%1), DATE(1899, 12, 30), DAY)</formula>
       <argument type='date' />
     </function>
     <function group='cast' name='MAKEDATE' return-type='date'>
@@ -587,7 +587,7 @@
       <argument type='datetime' />
     </function>
     <function group='cast' name='MAKETIME' return-type='datetime'>
-      <formula>DATETIME(1900, 1, 1, (%1), (%2), (%3))</formula>
+      <formula>DATETIME(1899, 12, 30, (%1), (%2), (%3))</formula>
       <argument type='int' />
       <argument type='int' />
       <argument type='int' />
