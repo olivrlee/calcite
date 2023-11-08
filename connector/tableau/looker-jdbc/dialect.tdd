@@ -238,7 +238,7 @@
       <argument type='real' />
     </function>
     <function group='numeric' name='SQRT' return-type='real'>
-      <formula>IF((%1) < 0, NULL, SQRT(%1))</formula>
+      <formula>IF((%1) &lt; 0, NULL, SQRT(%1))</formula>
       <argument type='real' />
     </function>
     <function group='numeric' name='SQUARE' return-type='real'>
