@@ -215,7 +215,7 @@
       <argument type='real' />
     </function>
     <function group='numeric' name='ROUND' return-type='real'>
-      <formula>ROUND((%1), (%2))</formula>
+      <formula>ROUND((%1), CAST((%2) AS INTEGER))</formula>
       <argument type='real' />
       <argument type='real' />
     </function>
@@ -481,7 +481,7 @@
     </function>
     <function group='cast' name='DATE' return-type='date'>
       <!-- First cast to DATETIME, then DATE, in case the string has a time component. -->
-      <formula>CAST(CAST((%1) AS DATETIME) AS DATE)</formula>
+      <formula>CAST(SAFE_CAST((%1) AS DATETIME) AS DATE)</formula>
       <argument type='str' />
     </function>
     <function group='cast' name='DATE' return-type='date'>
@@ -502,7 +502,7 @@
       <argument type='int' />
     </function>
     <function group='cast' name='DATETIME' return-type='datetime'>
-      <formula>CAST((%1) AS DATETIME)</formula>
+      <formula>SAFE_CAST((%1) AS DATETIME)</formula>
       <argument type='str' />
     </function>
     <function group='cast' name='DATETIME' return-type='datetime'>
@@ -530,11 +530,11 @@
       <argument type='str' />
     </function>
     <function group='cast' name='FLOAT' return-type='real'>
-      <formula>(CAST(DATETIME_DIFF((%1), DATETIME(1899, 12, 30, 0, 0, 0), SECOND) AS FLOAT64) / (60.0 * 60.0 * 24.0))</formula>
+      <formula>(CAST(DATETIME_DIFF((%1), DATETIME(1900, 1, 1, 0, 0, 0), SECOND) AS FLOAT64) / (60.0 * 60.0 * 24.0))</formula>
       <argument type='datetime' />
     </function>
     <function group='cast' name='FLOAT' return-type='real'>
-      <formula>CAST(DATE_DIFF((%1), DATE(1899, 12, 30), DAY) AS FLOAT64)</formula>
+      <formula>CAST(DATE_DIFF((%1), DATE(1900, 1, 1), DAY) AS FLOAT64)</formula>
       <argument type='date' />
     </function>
     <function group='cast' name='INT' return-type='int'>
@@ -558,11 +558,11 @@
       <argument type='str' />
     </function>
     <function group='cast' name='INT' return-type='int'>
-      <formula>CAST(TRUNC(CAST(DATETIME_DIFF((%1), DATETIME(1899, 12, 30, 0, 0, 0), SECOND) AS FLOAT64) / (60.0 * 60.0 * 24.0)) AS INTEGER)</formula>
+      <formula>CAST(TRUNC(CAST(DATETIME_DIFF((%1), DATETIME(1900, 1, 1, 0, 0, 0), SECOND) AS FLOAT64) / (60.0 * 60.0 * 24.0)) AS INTEGER)</formula>
       <argument type='datetime' />
     </function>
     <function group='cast' name='INT' return-type='int'>
-      <formula>DATE_DIFF((%1), DATE(1899, 12, 30), DAY)</formula>
+      <formula>DATE_DIFF((%1), DATE(1900, 1, 1), DAY)</formula>
       <argument type='date' />
     </function>
     <function group='cast' name='MAKEDATE' return-type='date'>
@@ -1003,12 +1003,12 @@
       <argument type='str' />
     </function>
     <function group='operator' name='!=' return-type='bool'>
-      <formula>(CAST((%1) AS DATETIME) != (%2))</formula>
+      <formula>(SAFE_CAST((%1) AS DATETIME) != (%2))</formula>
       <argument type='str' />
       <argument type='datetime' />
     </function>
     <function group='operator' name='!=' return-type='bool'>
-      <formula>((%1) != CAST((%2) AS DATETIME))</formula>
+      <formula>((%1) != SAFE_CAST((%2) AS DATETIME))</formula>
       <argument type='datetime' />
       <argument type='str' />
     </function>
@@ -1083,31 +1083,26 @@
       <argument type='str' />
     </function>
     <function group='operator' name='+' return-type='datetime'>
-      <!-- TODO: Expected semantics unclear. Currently interpreting the real number as "days". -->
       <formula>DATETIME_ADD((%1), INTERVAL (CAST(TRUNC((%2) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
       <argument type='datetime' />
       <argument type='real' />
     </function>
     <function group='operator' name='+' return-type='datetime'>
-      <!-- TODO: Expected semantics unclear. Currently interpreting the integer as "days". -->
       <formula>DATETIME_ADD((%1), INTERVAL (%2) DAY)</formula>
       <argument type='datetime' />
       <argument type='int' />
     </function>
     <function group='operator' name='+' return-type='datetime'>
-      <!-- TODO: Expected semantics unclear. Currently interpreting the real number as "days". -->
       <formula>DATETIME_ADD(DATETIME(%1), INTERVAL (CAST(TRUNC((%2) * (60.0 * 60.0 * 24.0)) AS INTEGER)) SECOND)</formula>
       <argument type='date' />
       <argument type='real' />
     </function>
     <function group='operator' name='+' return-type='date'>
-      <!-- TODO: Expected semantics unclear. Currently interpreting the real number as "days". -->
       <formula>DATE_ADD((%1), INTERVAL (CAST(TRUNC(%2) AS INTEGER)) DAY)</formula>
       <argument type='date' />
       <argument type='real' />
     </function>
     <function group='operator' name='+' return-type='date'>
-      <!-- TODO: Expected semantics unclear. Currently interpreting the integer as "days". -->
       <formula>DATE_ADD((%1), INTERVAL (%2) DAY)</formula>
       <argument type='date' />
       <argument type='int' />
@@ -1520,7 +1515,6 @@
       <formula part='month'>DATETIME_ADD((%3), INTERVAL (%2) MONTH)</formula>
       <formula part='dayofyear'>DATETIME_ADD((%3), INTERVAL (%2) DAY)</formula>
       <formula part='day'>DATETIME_ADD((%3), INTERVAL (%2) DAY)</formula>
-      <!-- TODO: Expected semantics unclear. This is based off the example dialect. -->
       <formula part='weekday'>DATETIME_ADD((%3), INTERVAL (%2) DAY)</formula>
       <formula part='week'>DATETIME_ADD((%3), INTERVAL (%2) WEEK)</formula>
       <formula part='hour'>DATETIME_ADD((%3), INTERVAL (%2) HOUR)</formula>
