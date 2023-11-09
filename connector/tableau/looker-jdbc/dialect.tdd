@@ -1555,7 +1555,7 @@
       <formula part='dayofyear'>CAST(EXTRACT(DAYOFYEAR FROM (%2)) AS STRING)</formula>
       <formula part='day'>CAST(EXTRACT(DAY FROM (%2)) AS STRING)</formula>
       <formula part='weekday'>CAST((%2) AS STRING FORMAT "DAY")</formula>
-      <formula part='week'>CAST(EXTRACT(WEEK FROM (%2)) AS STRING)</formula>
+      <formula part='week'>CAST((EXTRACT(WEEK FROM (%2)) + 1) AS STRING)</formula>
       <formula part='hour'>CAST(EXTRACT(HOUR FROM (%2)) AS STRING)</formula>
       <formula part='minute'>CAST(EXTRACT(MINUTE FROM (%2)) AS STRING)</formula>
       <formula part='second'>CAST(EXTRACT(SECOND FROM (%2)) AS STRING)</formula>
@@ -1563,7 +1563,7 @@
       <argument type='datetime' />
     </date-function>
     <date-function name='DATENAME' return-type='str'>
-      <formula part='week'>CAST(EXTRACT(WEEK FROM (%2)) AS STRING)</formula>
+      <formula part='week'>CAST((EXTRACT(WEEK(%3) FROM (%2)) + 1) AS STRING)</formula>
       <argument type='localstr' />
       <argument type='datetime' />
       <argument type='localstr' />
@@ -1580,7 +1580,7 @@
       <formula part='dayofyear'>EXTRACT(DAYOFYEAR FROM (%2))</formula>
       <formula part='day'>EXTRACT(DAY FROM (%2))</formula>
       <formula part='weekday'>EXTRACT(DAYOFWEEK FROM (%2))</formula>
-      <formula part='week'>EXTRACT(WEEK FROM (%2))</formula>
+      <formula part='week'>EXTRACT(WEEK FROM (%2)) + 1</formula>
       <formula part='hour'>EXTRACT(HOUR FROM (%2))</formula>
       <formula part='minute'>EXTRACT(MINUTE FROM (%2))</formula>
       <formula part='second'>EXTRACT(SECOND FROM (%2))</formula>
@@ -1588,7 +1588,7 @@
       <argument type='datetime' />
     </date-function>
     <date-function name='DATEPART' return-type='int'>
-      <formula part='week'>EXTRACT(WEEK FROM (%2))</formula>
+      <formula part='week'>EXTRACT(WEEK(%3) FROM (%2)) + 1</formula>
       <argument type='localstr' />
       <argument type='datetime' />
       <argument type='localstr' />
