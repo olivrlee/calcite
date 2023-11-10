@@ -1542,7 +1542,7 @@
       <argument type='datetime' />
     </date-function>
     <date-function name='DATEDIFF' return-type='int'>
-      <formula part='week'>DATETIME_DIFF((%3), (%2), WEEK(%4))</formula>
+      <formula part='week'>CASE (%4) WHEN 0 THEN DATETIME_DIFF((%3), (%2), WEEK(SUNDAY)) WHEN 1 THEN DATETIME_DIFF((%3), (%2), WEEK(MONDAY)) WHEN 2 THEN DATETIME_DIFF((%3), (%2), WEEK(TUESDAY)) WHEN 3 THEN DATETIME_DIFF((%3), (%2), WEEK(WEDNESDAY)) WHEN 4 THEN DATETIME_DIFF((%3), (%2), WEEK(THURSDAY)) WHEN 5 THEN DATETIME_DIFF((%3), (%2), WEEK(FRIDAY)) WHEN 6 THEN DATETIME_DIFF((%3), (%2), WEEK(SATURDAY)) ELSE DATETIME_DIFF((%3), (%2), WEEK) END</formula>
       <argument type='localstr' />
       <argument type='datetime' />
       <argument type='datetime' />
@@ -1563,7 +1563,7 @@
       <argument type='datetime' />
     </date-function>
     <date-function name='DATENAME' return-type='str'>
-      <formula part='week'>CAST((EXTRACT(WEEK(%3) FROM (%2)) + 1) AS STRING)</formula>
+      <formula part='week'>CAST((CASE (%3) WHEN 0 THEN EXTRACT(WEEK(SUNDAY) FROM (%2)) WHEN 1 THEN EXTRACT(WEEK(MONDAY) FROM (%2)) WHEN 2 THEN EXTRACT(WEEK(TUESDAY) FROM (%2)) WHEN 3 THEN EXTRACT(WEEK(WEDNESDAY) FROM (%2)) WHEN 4 THEN EXTRACT(WEEK(THURSDAY) FROM (%2)) WHEN 5 THEN EXTRACT(WEEK(FRIDAY) FROM (%2)) WHEN 6 THEN EXTRACT(WEEK(SATURDAY) FROM (%2)) ELSE EXTRACT(WEEK FROM (%2)) END + 1) AS STRING)</formula>
       <argument type='localstr' />
       <argument type='datetime' />
       <argument type='localstr' />
@@ -1588,7 +1588,7 @@
       <argument type='datetime' />
     </date-function>
     <date-function name='DATEPART' return-type='int'>
-      <formula part='week'>EXTRACT(WEEK(%3) FROM (%2)) + 1</formula>
+      <formula part='week'>CASE (%3) WHEN 0 THEN EXTRACT(WEEK(SUNDAY) FROM (%2)) WHEN 1 THEN EXTRACT(WEEK(MONDAY) FROM (%2)) WHEN 2 THEN EXTRACT(WEEK(TUESDAY) FROM (%2)) WHEN 3 THEN EXTRACT(WEEK(WEDNESDAY) FROM (%2)) WHEN 4 THEN EXTRACT(WEEK(THURSDAY) FROM (%2)) WHEN 5 THEN EXTRACT(WEEK(FRIDAY) FROM (%2)) WHEN 6 THEN EXTRACT(WEEK(SATURDAY) FROM (%2)) ELSE EXTRACT(WEEK FROM (%2)) END + 1</formula>
       <argument type='localstr' />
       <argument type='datetime' />
       <argument type='localstr' />
@@ -1609,7 +1609,7 @@
       <argument type='date' />
     </date-function>
     <date-function name='DATETRUNC' return-type='date'>
-      <formula part='week'>DATE_TRUNC((%2), WEEK(%3))</formula>
+      <formula part='week'>CASE (%3) WHEN 0 THEN DATE_TRUNC((%2), WEEK(SUNDAY)) WHEN 1 THEN DATE_TRUNC((%2), WEEK(MONDAY)) WHEN 2 THEN DATE_TRUNC((%2), WEEK(TUESDAY)) WHEN 3 THEN DATE_TRUNC((%2), WEEK(WEDNESDAY)) WHEN 4 THEN DATE_TRUNC((%2), WEEK(THURSDAY)) WHEN 5 THEN DATE_TRUNC((%2), WEEK(FRIDAY)) WHEN 6 THEN DATE_TRUNC((%2), WEEK(SATURDAY)) ELSE DATE_TRUNC((%2), WEEK) END</formula>
       <argument type='localstr' />
       <argument type='date' />
       <argument type='localstr' />
@@ -1630,7 +1630,7 @@
       <argument type='datetime' />
     </date-function>
     <date-function name='DATETRUNC' return-type='datetime'>
-      <formula part='week'>DATETIME_TRUNC(CAST((%2) AS DATETIME), WEEK(%3))</formula>
+      <formula part='week'>CASE (%3) WHEN 0 THEN DATETIME_TRUNC(CAST((%2) AS DATETIME), WEEK(SUNDAY)) WHEN 1 THEN DATETIME_TRUNC(CAST((%2) AS DATETIME), WEEK(MONDAY)) WHEN 2 THEN DATETIME_TRUNC(CAST((%2) AS DATETIME), WEEK(TUESDAY)) WHEN 3 THEN DATETIME_TRUNC(CAST((%2) AS DATETIME), WEEK(WEDNESDAY)) WHEN 4 THEN DATETIME_TRUNC(CAST((%2) AS DATETIME), WEEK(THURSDAY)) WHEN 5 THEN DATETIME_TRUNC(CAST((%2) AS DATETIME), WEEK(FRIDAY)) WHEN 6 THEN DATETIME_TRUNC(CAST((%2) AS DATETIME), WEEK(SATURDAY)) ELSE DATETIME_TRUNC(CAST((%2) AS DATETIME), WEEK) END</formula>
       <argument type='localstr' />
       <argument type='datetime' />
       <argument type='localstr' />
@@ -1886,6 +1886,5 @@
       <token key="V" value="TZ" />    <!-- Time Zone: specific non-location, identical to z (PDT) -->
       <token key="VVVV" value="TZ" /> <!-- Time Zone: generic location (United States (Los Angeles)) -->
     </icu-date-token-map>
-    <start-of-week-format value="String" />
   </sql-format>
 </dialect>
