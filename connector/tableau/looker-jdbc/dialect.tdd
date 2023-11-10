@@ -1615,22 +1615,22 @@
       <argument type='localstr' />
     </date-function>
     <date-function name='DATETRUNC' return-type='datetime'>
-      <formula>DATETIME_TRUNC((%2), %1)</formula>
-      <formula part='year'>DATETIME_TRUNC((%2), YEAR)</formula>
-      <formula part='quarter'>DATETIME_TRUNC((%2), QUARTER)</formula>
-      <formula part='month'>DATETIME_TRUNC((%2), MONTH)</formula>
-      <formula part='dayofyear'>DATETIME_TRUNC((%2), DAY)</formula>
-      <formula part='day'>DATETIME_TRUNC((%2), DAY)</formula>
-      <formula part='weekday'>DATETIME_TRUNC((%2), DAY)</formula>
-      <formula part='week'>DATETIME_TRUNC((%2), WEEK)</formula>
-      <formula part='hour'>DATETIME_TRUNC((%2), HOUR)</formula>
-      <formula part='minute'>DATETIME_TRUNC((%2), MINUTE)</formula>
-      <formula part='second'>DATETIME_TRUNC((%2), SECOND)</formula>
+      <formula>DATETIME_TRUNC(CAST((%2) AS DATETIME), %1)</formula>
+      <formula part='year'>DATETIME_TRUNC(CAST((%2) AS DATETIME), YEAR)</formula>
+      <formula part='quarter'>DATETIME_TRUNC(CAST((%2) AS DATETIME), QUARTER)</formula>
+      <formula part='month'>DATETIME_TRUNC(CAST((%2) AS DATETIME), MONTH)</formula>
+      <formula part='dayofyear'>DATETIME_TRUNC(CAST((%2) AS DATETIME), DAY)</formula>
+      <formula part='day'>DATETIME_TRUNC(CAST((%2) AS DATETIME), DAY)</formula>
+      <formula part='weekday'>DATETIME_TRUNC(CAST((%2) AS DATETIME), DAY)</formula>
+      <formula part='week'>DATETIME_TRUNC(CAST((%2) AS DATETIME), WEEK)</formula>
+      <formula part='hour'>DATETIME_TRUNC(CAST((%2) AS DATETIME), HOUR)</formula>
+      <formula part='minute'>DATETIME_TRUNC(CAST((%2) AS DATETIME), MINUTE)</formula>
+      <formula part='second'>DATETIME_TRUNC(CAST((%2) AS DATETIME), SECOND)</formula>
       <argument type='localstr' />
       <argument type='datetime' />
     </date-function>
     <date-function name='DATETRUNC' return-type='datetime'>
-      <formula part='week'>DATETIME_TRUNC((%2), WEEK(%3))</formula>
+      <formula part='week'>DATETIME_TRUNC(CAST((%2) AS DATETIME), WEEK(%3))</formula>
       <argument type='localstr' />
       <argument type='datetime' />
       <argument type='localstr' />
@@ -1886,5 +1886,6 @@
       <token key="V" value="TZ" />    <!-- Time Zone: specific non-location, identical to z (PDT) -->
       <token key="VVVV" value="TZ" /> <!-- Time Zone: generic location (United States (Los Angeles)) -->
     </icu-date-token-map>
+    <start-of-week-format value="String" />
   </sql-format>
 </dialect>
