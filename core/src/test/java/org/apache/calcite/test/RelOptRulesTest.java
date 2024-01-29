@@ -101,6 +101,7 @@ import org.apache.calcite.rex.RexInputRef;
 import org.apache.calcite.rex.RexLiteral;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.rex.RexUtil;
+import org.apache.calcite.schema.Schema;
 import org.apache.calcite.sql.SqlBasicFunction;
 import org.apache.calcite.sql.SqlFunction;
 import org.apache.calcite.sql.SqlFunctionCategory;
@@ -3769,6 +3770,7 @@ class RelOptRulesTest extends RelOptTestBase {
                 registerSchema(schema);
                 final RelDataType intType =
                     typeFactory.createSqlType(SqlTypeName.INTEGER);
+                final Schema x = this.rootSchema.schema;
                 for (int i = 0; i < 10; i++) {
                   String t = String.valueOf((char) ('A' + i));
                   MockTable table = MockTable.create(this, schema, t, false, 100);

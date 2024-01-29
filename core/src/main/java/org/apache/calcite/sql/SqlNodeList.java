@@ -16,8 +16,10 @@
  */
 package org.apache.calcite.sql;
 
+import java.util.Set;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.util.SqlVisitor;
+import org.apache.calcite.sql.validate.AlwaysFilterValidator;
 import org.apache.calcite.sql.validate.SqlValidator;
 import org.apache.calcite.sql.validate.SqlValidatorScope;
 import org.apache.calcite.util.Litmus;
@@ -266,6 +268,12 @@ public class SqlNodeList extends SqlNode implements List<SqlNode>, RandomAccess 
       }
       child.validate(validator, scope);
     }
+  }
+
+  @Override
+  public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
+      Set<String> alwaysFilterFields) {
+    System.out.println("SqlNodeList");
   }
 
   @Override public <R> R accept(SqlVisitor<R> visitor) {

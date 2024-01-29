@@ -16,9 +16,11 @@
  */
 package org.apache.calcite.sql;
 
+import java.util.Set;
 import org.apache.calcite.rel.type.DynamicRecordType;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.util.SqlVisitor;
+import org.apache.calcite.sql.validate.AlwaysFilterValidator;
 import org.apache.calcite.sql.validate.SqlMonotonicity;
 import org.apache.calcite.sql.validate.SqlQualified;
 import org.apache.calcite.sql.validate.SqlValidator;
@@ -293,6 +295,12 @@ public class SqlIdentifier extends SqlNode {
 
   @Override public void validate(SqlValidator validator, SqlValidatorScope scope) {
     validator.validateIdentifier(this, scope);
+  }
+
+  @Override
+  public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
+      Set<String> alwaysFilterFields) {
+    System.out.println("SqlIdentifier");
   }
 
   @Override public void validateExpr(SqlValidator validator, SqlValidatorScope scope) {

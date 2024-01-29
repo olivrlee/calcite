@@ -153,6 +153,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static org.apache.calcite.linq4j.Nullness.castNonNull;
 import static org.apache.calcite.sql.SqlUtil.stripAs;
 import static org.apache.calcite.sql.type.NonNullableAccessors.getCharset;
@@ -192,6 +193,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
 
   private final SqlOperatorTable opTab;
   final SqlValidatorCatalogReader catalogReader;
+  public AlwaysFilterValidator alwaysFilterValidator = null;
 
   /**
    * Maps {@link SqlParserPos} strings to the {@link SqlIdentifier} identifier
@@ -323,6 +325,8 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
     @SuppressWarnings("argument.type.incompatible")
     TypeCoercion typeCoercion = config.typeCoercionFactory().create(typeFactory, this);
     this.typeCoercion = typeCoercion;
+    // this.alwaysFilterValidator = new AlwaysFilterValidatorImpl(this.opTab, this.catalogReader, this.typeFactory, this.config);
+    this.alwaysFilterValidator = alwaysFilterValidator;
 
     if (config.conformance().allowLenientCoercion()) {
       final SqlTypeCoercionRule rules =
@@ -348,6 +352,24 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
       SqlTypeCoercionRule.THREAD_PROVIDERS.set(rules2);
     } else if (config.typeCoercionRules() != null) {
       SqlTypeCoercionRule.THREAD_PROVIDERS.set(config.typeCoercionRules());
+    }
+  }
+  protected SqlValidatorImpl SqlValidatorImpl(
+      SqlOperatorTable opTab,
+      SqlValidatorCatalogReader catalogReader,
+      RelDataTypeFactory typeFactory,
+      Config config,
+      AlwaysFilterValidator alwaysFilterValidator) {
+    SqlValidatorImpl validator =  new SqlValidatorImpl(opTab, catalogReader, typeFactory, config);
+    validator.alwaysFilterValidator = alwaysFilterValidator;
+    return validator;
+  }
+
+  public SqlValidatorImpl withAlwaysFilterValidator(AlwaysFilterValidator alwaysFilterValidator) {
+    if (this.alwaysFilterValidator == alwaysFilterValidator) {
+      return this;
+    } else {
+      return SqlValidatorImpl(this.opTab, this.catalogReader, this.typeFactory, this.config, alwaysFilterValidator);
     }
   }
 
@@ -2733,7 +2755,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
    * @param alias       Name of this query within its parent. Must be specified
    *                    if usingScope != null
    */
-  private void registerQuery(
+  protected void registerQuery(
       SqlValidatorScope parentScope,
       @Nullable SqlValidatorScope usingScope,
       SqlNode node,
@@ -6310,7 +6332,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
 
   @Override public List<@Nullable List<String>> getFieldOrigins(SqlNode sqlQuery) {
     if (sqlQuery instanceof SqlExplain) {
-      return Collections.emptyList();
+      return emptyList();
     }
     final RelDataType rowType = getValidatedNodeType(sqlQuery);
     final int fieldCount = rowType.getFieldCount();

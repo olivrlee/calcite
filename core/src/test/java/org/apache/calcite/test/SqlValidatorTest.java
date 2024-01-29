@@ -15,14 +15,20 @@
  * limitations under the License.
  */
 package org.apache.calcite.test;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Set;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.avatica.util.Quoting;
 import org.apache.calcite.avatica.util.TimeUnit;
 import org.apache.calcite.config.Lex;
+import org.apache.calcite.rel.RelCollation;
 import org.apache.calcite.rel.type.DelegatingTypeSystem;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.rel.type.RelDataTypeSystem;
+import org.apache.calcite.rel.type.StructKind;
 import org.apache.calcite.rel.type.TimeFrameSet;
 import org.apache.calcite.runtime.CalciteContextException;
 import org.apache.calcite.sql.SqlCollation;
@@ -36,6 +42,7 @@ import org.apache.calcite.sql.fun.SqlLibraryOperatorTableFactory;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParser;
+import org.apache.calcite.sql.test.SqlTestFactory;
 import org.apache.calcite.sql.type.ArraySqlType;
 import org.apache.calcite.sql.type.SqlTypeFactoryImpl;
 import org.apache.calcite.sql.type.SqlTypeName;
@@ -50,7 +57,14 @@ import org.apache.calcite.sql.validate.SqlValidator;
 import org.apache.calcite.sql.validate.SqlValidatorCatalogReader;
 import org.apache.calcite.sql.validate.SqlValidatorImpl;
 import org.apache.calcite.sql.validate.SqlValidatorUtil;
+import org.apache.calcite.sql2rel.InitializerExpressionFactory;
+import org.apache.calcite.sql2rel.NullInitializerExpressionFactory;
 import org.apache.calcite.test.catalog.CountingFactory;
+import org.apache.calcite.test.catalog.MockCatalogReader;
+import org.apache.calcite.test.catalog.MockCatalogReader.ColumnResolver;
+import org.apache.calcite.test.catalog.MockCatalogReader.MockSchema;
+import org.apache.calcite.test.catalog.MockCatalogReader.MockTable;
+import org.apache.calcite.test.catalog.MockCatalogReader.MockViewTable.AlwaysFilterMockTable;
 import org.apache.calcite.testlib.annotations.LocaleEnUs;
 import org.apache.calcite.tools.ValidationException;
 import org.apache.calcite.util.Bug;
@@ -11690,6 +11704,56 @@ public class SqlValidatorTest extends SqlValidatorTestCase {
     final SqlNode validated = validator.validateParameterizedExpression(sqlNode, nameToTypeMap);
     final RelDataType resultType = validator.getValidatedNodeType(validated);
     assertThat(resultType, hasToString("INTEGER"));
+  }
+  @Test void testErrorsOnMissingAlwaysFilter() {
+    final SqlTestFactory.CatalogReaderFactory catalogReaderFactory = (typeFactory, caseSensitive) ->
+        new MockCatalogReader(typeFactory, caseSensitive) {
+          @Override public MockCatalogReader init() {
+            MockSchema salesSchema = new MockSchema("SALES");
+            registerSchema(salesSchema);
+            Map<String, Object> empAlwaysFilterFields = new HashMap<String, Object>() {{
+              put("EMPNO", "10");
+              put("JOB", "JOB_1");
+            }};
+            // Register "EMP" table.
+            AlwaysFilterMockTable empTable = AlwaysFilterMockTable.create(this, salesSchema, "EMP", false, 14, null,
+                NullInitializerExpressionFactory.INSTANCE, false, empAlwaysFilterFields);
+            empTable.setAlwaysFilterFields(empAlwaysFilterFields);
+
+            empTable.addColumn("EMPNO", typeFactory.createSqlType(SqlTypeName.INTEGER), true);
+            empTable.addColumn("ENAME", typeFactory.createSqlType(SqlTypeName.VARCHAR));
+            empTable.addColumn("JOB", typeFactory.createSqlType(SqlTypeName.VARCHAR));
+            empTable.addColumn("MGR", typeFactory.createSqlType(SqlTypeName.INTEGER));
+            empTable.addColumn("HIREDATE", typeFactory.createSqlType(SqlTypeName.TIMESTAMP));
+            empTable.addColumn("SAL", typeFactory.createSqlType(SqlTypeName.INTEGER));
+            empTable.addColumn("COMM", typeFactory.createSqlType(SqlTypeName.INTEGER));
+            empTable.addColumn("DEPTNO", typeFactory.createSqlType(SqlTypeName.INTEGER));
+            empTable.addColumn("SLACKER", typeFactory.createSqlType(SqlTypeName.BOOLEAN));
+            registerTable(empTable);
+
+            // Register "DEPT" table.
+            Map<String, Object> deptAlwaysFilterFields = new HashMap<String, Object>() {{
+              put("NAME", "ACCOUNTING_DEPT");
+            }};
+            AlwaysFilterMockTable deptTable = AlwaysFilterMockTable.create(this, salesSchema, "DEPT", false, 14, null,
+                NullInitializerExpressionFactory.INSTANCE, false, deptAlwaysFilterFields);
+            // deptTable.setAlwaysFilterFields();
+            deptTable.addColumn("DEPTNO", typeFactory.createSqlType(SqlTypeName.INTEGER), true);
+            deptTable.addColumn("NAME", typeFactory.createSqlType(SqlTypeName.VARCHAR));
+            registerTable(deptTable);
+            return this;
+          }
+        }.init();
+
+    String sql = "select * from (select * from emp where empno = 1)";
+    // String sql = "select * from emp where empno = 1";
+    // String sql = "select * from emp where concat(emp.ename, ' ') = 'abc'";
+    final SqlValidatorFixture s = fixture()
+        .withOperatorTable(operatorTableFor(SqlLibrary.POSTGRESQL))
+        .withCatalogReader(catalogReaderFactory)
+        .withSql(sql)
+        .fails(
+            "SQL statement did not contain filters on the following fields: \\[JOB\\]");
   }
 
   @Test void testAccessingNestedFieldsOfNullableRecord() {

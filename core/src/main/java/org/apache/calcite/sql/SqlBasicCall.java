@@ -16,6 +16,8 @@
  */
 package org.apache.calcite.sql;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.util.ImmutableNullableList;
 
@@ -129,6 +131,18 @@ public class SqlBasicCall extends SqlCall {
 
   @Override public SqlNode clone(SqlParserPos pos) {
     return getOperator().createCall(getFunctionQuantifier(), pos, operandList);
+  }
+
+  @Override public List<SqlIdentifier> collectSqlIdentifiers() {
+    List<SqlIdentifier> list = new ArrayList<>();
+    for (SqlNode operand : operandList)
+    {
+      if (operand instanceof SqlIdentifier) {
+        list.add((SqlIdentifier) operand);
+      }
+      list.addAll( operand.collectSqlIdentifiers());
+    }
+    return list;
   }
 
   /** Sets the {@code i}th element of {@code list} to value {@code e}, creating

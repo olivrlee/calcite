@@ -16,8 +16,11 @@
  */
 package org.apache.calcite.sql;
 
+import java.util.Set;
 import org.apache.calcite.sql.parser.SqlParserPos;
 
+import org.apache.calcite.sql.validate.AlwaysFilterValidator;
+import org.apache.calcite.sql.validate.SqlValidatorScope;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -46,6 +49,12 @@ public abstract class SqlAlter extends SqlCall {
       writer.keyword(scope);
     }
     unparseAlterOperation(writer, leftPrec, rightPrec);
+  }
+
+  @Override
+  public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
+      Set<String> alwaysFilterFields) {
+
   }
 
   protected abstract void unparseAlterOperation(SqlWriter writer, int leftPrec, int rightPrec);

@@ -37,7 +37,9 @@ import org.apache.calcite.sql.parser.SqlParserUtil;
 import org.apache.calcite.sql.parser.StringAndPos;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.sql.util.SqlShuttle;
+import org.apache.calcite.sql.validate.AlwaysFilterValidator;
 import org.apache.calcite.sql.validate.SqlValidator;
+import org.apache.calcite.sql.validate.SqlValidatorImpl;
 import org.apache.calcite.sql.validate.SqlValidatorUtil;
 import org.apache.calcite.sql2rel.RelFieldTrimmer;
 import org.apache.calcite.sql2rel.SqlToRelConverter;
@@ -58,6 +60,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static java.util.Collections.emptyList;
 import static org.apache.calcite.test.Matchers.relIsValid;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -100,10 +103,13 @@ public abstract class AbstractSqlTester implements SqlTester, AutoCloseable {
       return;
     }
 
-    final SqlValidator validator = factory.createValidator();
+    // final AlwaysFilterValidator alwaysFilterValidator = factory.createAlwaysFilterValidator();
+    final SqlValidatorImpl validator = (SqlValidatorImpl) factory.createValidator();
+    // final AlwaysFilterValidator alwaysFilterValidator = validator.always.createAlwaysFilterValidator();
     Throwable thrown = null;
     try {
       validator.validate(sqlNode);
+      validator.alwaysFilterValidator.validate(sqlNode);
     } catch (Throwable ex) {
       thrown = ex;
     }

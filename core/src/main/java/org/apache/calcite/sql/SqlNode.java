@@ -16,11 +16,13 @@
  */
 package org.apache.calcite.sql;
 
+import java.util.Collections;
 import org.apache.calcite.sql.dialect.AnsiSqlDialect;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.pretty.SqlPrettyWriter;
 import org.apache.calcite.sql.util.SqlString;
 import org.apache.calcite.sql.util.SqlVisitor;
+import org.apache.calcite.sql.validate.AlwaysFilterValidator;
 import org.apache.calcite.sql.validate.SqlMoniker;
 import org.apache.calcite.sql.validate.SqlMonotonicity;
 import org.apache.calcite.sql.validate.SqlValidator;
@@ -243,6 +245,15 @@ public abstract class SqlNode implements Cloneable {
       SqlValidator validator,
       SqlValidatorScope scope);
 
+  //TODO this should be abstract and inheritors implement
+  public void validateAlwaysFilter(
+      AlwaysFilterValidator validator,
+      SqlValidatorScope scope,
+      Set<String> alwaysFilterFields
+  ) {
+    System.out.println("SqlNode");
+  };
+
   /**
    * Lists all the valid alternatives for this node if the parse position of
    * the node matches that of pos. Only implemented now for SqlCall and
@@ -386,4 +397,7 @@ public abstract class SqlNode implements Cloneable {
         ArrayList::new, ArrayList::add, Util::combine,
         (ArrayList<@Nullable SqlNode> list) -> SqlNodeList.of(pos, list));
   }
+  public List<SqlIdentifier> collectSqlIdentifiers() {
+    return Collections.emptyList();
+  };
 }

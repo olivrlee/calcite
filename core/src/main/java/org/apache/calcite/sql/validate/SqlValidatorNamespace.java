@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.sql.validate;
 
+import java.util.Set;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeField;
 import org.apache.calcite.sql.SqlNode;
@@ -114,6 +115,8 @@ public interface SqlValidatorNamespace {
    *                      type 'unknown'.
    */
   void validate(RelDataType targetRowType);
+
+  void validateAlwaysFilter(Set<String> alwaysFilterFields);
 
   /**
    * Returns the parse tree node at the root of this namespace.

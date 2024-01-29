@@ -16,8 +16,10 @@
  */
 package org.apache.calcite.sql;
 
+import java.util.Set;
 import org.apache.calcite.sql.fun.SqlInternalOperators;
 import org.apache.calcite.sql.parser.SqlParserPos;
+import org.apache.calcite.sql.validate.AlwaysFilterValidator;
 import org.apache.calcite.sql.validate.SqlValidator;
 import org.apache.calcite.sql.validate.SqlValidatorScope;
 import org.apache.calcite.util.ImmutableNullableList;
@@ -312,6 +314,12 @@ public class SqlSelect extends SqlCall {
 
   public boolean hasWhere() {
     return where != null;
+  }
+
+  @Override
+  public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
+      Set<String> alwaysFilterFields) {
+    validator.validateQueryAlwaysFilter(this, scope, alwaysFilterFields);
   }
 
   public boolean isKeywordPresent(SqlSelectKeyword targetKeyWord) {

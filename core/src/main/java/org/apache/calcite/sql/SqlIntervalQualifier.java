@@ -25,6 +25,7 @@ import org.apache.calcite.runtime.CalciteContextException;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.sql.util.SqlVisitor;
+import org.apache.calcite.sql.validate.AlwaysFilterValidator;
 import org.apache.calcite.sql.validate.SqlValidator;
 import org.apache.calcite.sql.validate.SqlValidatorScope;
 import org.apache.calcite.util.Litmus;
@@ -277,6 +278,12 @@ public class SqlIntervalQualifier extends SqlNode {
       SqlValidator validator,
       SqlValidatorScope scope) {
     validator.validateIntervalQualifier(this);
+  }
+
+  @Override
+  public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
+      Set<String> alwaysFilterFields) {
+      System.out.println("SqlIntervalQualifier");
   }
 
   @Override public <R> R accept(SqlVisitor<R> visitor) {

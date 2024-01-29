@@ -16,9 +16,12 @@
  */
 package org.apache.calcite.sql;
 
+import java.util.Collections;
+import java.util.Set;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.util.SqlVisitor;
+import org.apache.calcite.sql.validate.AlwaysFilterValidator;
 import org.apache.calcite.sql.validate.SqlMoniker;
 import org.apache.calcite.sql.validate.SqlMonotonicity;
 import org.apache.calcite.sql.validate.SqlValidator;
@@ -143,6 +146,12 @@ public abstract class SqlCall extends SqlNode {
     validator.validateCall(this, scope);
   }
 
+  @Override
+  public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
+      Set<String> alwaysFilterFields) {
+    System.out.println("SqlCall");
+  }
+
   @Override public void findValidOptions(
       SqlValidator validator,
       SqlValidatorScope scope,
@@ -233,6 +242,12 @@ public abstract class SqlCall extends SqlNode {
     }
 
     return false;
+  }
+  public List<SqlIdentifier> collectSqlIdentifiers() {
+    if (this instanceof SqlBasicCall) {
+      return this.collectSqlIdentifiers();
+    }
+    return Collections.emptyList();
   }
 
   @Pure

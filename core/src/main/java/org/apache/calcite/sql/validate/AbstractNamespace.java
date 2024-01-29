@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.sql.validate;
 
+import java.util.Set;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.rel.type.RelDataTypeField;
@@ -102,6 +103,10 @@ abstract class AbstractNamespace implements SqlValidatorNamespace {
     }
   }
 
+  @Override public final void validateAlwaysFilter(Set<String> alwaysFilterFields) {
+    validateAlwaysFilterImpl(alwaysFilterFields);
+  }
+
   /**
    * Validates this scope and returns the type of the records it returns.
    * External users should call {@link #validate}, which uses the
@@ -113,6 +118,10 @@ abstract class AbstractNamespace implements SqlValidatorNamespace {
    *                      type 'unknown'.
    */
   protected abstract RelDataType validateImpl(RelDataType targetRowType);
+
+  protected void validateAlwaysFilterImpl(Set<String> alwaysFilterFields) {
+    System.out.println("Default AbstractNamespace validateAlwaysFilterImpl");
+  };
 
   @Override public RelDataType getRowType() {
     if (rowType == null) {
