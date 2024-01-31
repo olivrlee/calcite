@@ -16,7 +16,6 @@
  */
 package org.apache.calcite.sql;
 
-import java.util.Set;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.sql.parser.SqlParserPos;
@@ -24,6 +23,8 @@ import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.sql.validate.AlwaysFilterValidator;
 import org.apache.calcite.sql.validate.SqlValidatorScope;
 import org.apache.calcite.util.TimestampString;
+
+import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
@@ -90,8 +91,7 @@ public abstract class SqlAbstractDateTimeLiteral extends SqlLiteral {
     writer.literal(this.toString());
   }
 
-  @Override
-  public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
+  @Override public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
       Set<String> alwaysFilterFields) {
 
   }

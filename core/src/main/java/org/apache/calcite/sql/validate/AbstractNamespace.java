@@ -16,7 +16,6 @@
  */
 package org.apache.calcite.sql.validate;
 
-import java.util.Set;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.rel.type.RelDataTypeField;
@@ -31,6 +30,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Abstract implementation of {@link SqlValidatorNamespace}.
@@ -119,9 +119,7 @@ abstract class AbstractNamespace implements SqlValidatorNamespace {
    */
   protected abstract RelDataType validateImpl(RelDataType targetRowType);
 
-  protected void validateAlwaysFilterImpl(Set<String> alwaysFilterFields) {
-    System.out.println("Default AbstractNamespace validateAlwaysFilterImpl");
-  };
+  protected void validateAlwaysFilterImpl(Set<String> alwaysFilterFields) {}
 
   @Override public RelDataType getRowType() {
     if (rowType == null) {

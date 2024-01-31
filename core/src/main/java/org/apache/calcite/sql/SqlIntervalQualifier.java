@@ -280,8 +280,7 @@ public class SqlIntervalQualifier extends SqlNode {
     validator.validateIntervalQualifier(this);
   }
 
-  @Override
-  public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
+  @Override public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
       Set<String> alwaysFilterFields) {
       System.out.println("SqlIntervalQualifier");
   }

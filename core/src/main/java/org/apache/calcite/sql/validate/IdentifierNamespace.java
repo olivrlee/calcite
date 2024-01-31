@@ -16,8 +16,6 @@
  */
 package org.apache.calcite.sql.validate;
 
-import java.util.Optional;
-import java.util.Set;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeField;
 import org.apache.calcite.sql.SqlCall;
@@ -36,10 +34,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.apache.calcite.util.Static.RESOURCE;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.calcite.util.Static.RESOURCE;
 
 /**
  * Namespace whose contents are defined by the type of an
@@ -188,7 +188,7 @@ public class IdentifierNamespace extends AbstractNamespace {
         RESOURCE.objectNotFound(id.getComponent(0).toString()));
   }
 
-      @Override public RelDataType validateImpl(RelDataType targetRowType) {
+  @Override public RelDataType validateImpl(RelDataType targetRowType) {
     resolvedNamespace = resolveImpl(id);
     if (resolvedNamespace instanceof TableNamespace) {
       SqlValidatorTable table = ((TableNamespace) resolvedNamespace).getTable();
@@ -248,13 +248,12 @@ public class IdentifierNamespace extends AbstractNamespace {
     return rowType;
   }
 
-  @Override
-  protected void validateAlwaysFilterImpl(Set<String> alwaysFilterFields) {
+  @Override protected void validateAlwaysFilterImpl(Set<String> alwaysFilterFields) {
     resolvedNamespace = resolveImpl(id);
     if (resolvedNamespace instanceof TableNamespace) {
       SqlValidatorTable table = ((TableNamespace) resolvedNamespace).getTable();
-      Optional<SemanticTable> semanticTable = Optional.ofNullable(
-          table.unwrap(SemanticTable.class));
+      Optional<SemanticTable> semanticTable =
+          Optional.ofNullable(table.unwrap(SemanticTable.class));
       if (semanticTable.isPresent()){
         SemanticTable semanticTable_ = semanticTable.get();
         for (RelDataTypeField field: table.getRowType().getFieldList()) {

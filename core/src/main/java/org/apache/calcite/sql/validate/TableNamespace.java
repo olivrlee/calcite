@@ -35,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.apache.calcite.util.Static.RESOURCE;
 
@@ -66,6 +67,9 @@ class TableNamespace extends AbstractNamespace {
     builder.addAll(table.getRowType().getFieldList());
     builder.addAll(extendedFields);
     return builder.build();
+  }
+  @Override public void validateAlwaysFilterImpl(Set<String> alwaysFilterFields) {
+    // ((AlwaysFilterValidator) validator).validateSelect(select, alwaysFilterFields);
   }
 
   @Override public @Nullable SqlNode getNode() {

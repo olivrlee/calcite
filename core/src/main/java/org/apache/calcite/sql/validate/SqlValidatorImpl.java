@@ -153,7 +153,6 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyList;
 import static org.apache.calcite.linq4j.Nullness.castNonNull;
 import static org.apache.calcite.sql.SqlUtil.stripAs;
 import static org.apache.calcite.sql.type.NonNullableAccessors.getCharset;
@@ -163,6 +162,7 @@ import static org.apache.calcite.sql.validate.SqlNonNullableAccessors.getTable;
 import static org.apache.calcite.util.Static.RESOURCE;
 import static org.apache.calcite.util.Util.first;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -325,8 +325,6 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
     @SuppressWarnings("argument.type.incompatible")
     TypeCoercion typeCoercion = config.typeCoercionFactory().create(typeFactory, this);
     this.typeCoercion = typeCoercion;
-    // this.alwaysFilterValidator = new AlwaysFilterValidatorImpl(this.opTab, this.catalogReader, this.typeFactory, this.config);
-    this.alwaysFilterValidator = alwaysFilterValidator;
 
     if (config.conformance().allowLenientCoercion()) {
       final SqlTypeCoercionRule rules =

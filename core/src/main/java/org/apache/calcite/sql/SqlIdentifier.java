@@ -16,7 +16,6 @@
  */
 package org.apache.calcite.sql;
 
-import java.util.Set;
 import org.apache.calcite.rel.type.DynamicRecordType;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.util.SqlVisitor;
@@ -35,6 +34,7 @@ import org.checkerframework.dataflow.qual.Pure;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -297,8 +297,7 @@ public class SqlIdentifier extends SqlNode {
     validator.validateIdentifier(this, scope);
   }
 
-  @Override
-  public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
+  @Override public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
       Set<String> alwaysFilterFields) {
     System.out.println("SqlIdentifier");
   }

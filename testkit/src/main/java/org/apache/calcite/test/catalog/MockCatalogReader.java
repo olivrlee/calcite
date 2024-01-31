@@ -16,7 +16,6 @@
  */
 package org.apache.calcite.test.catalog;
 
-import java.util.HashMap;
 import org.apache.calcite.adapter.java.AbstractQueryableTable;
 import org.apache.calcite.adapter.java.JavaTypeFactory;
 import org.apache.calcite.config.CalciteConnectionConfig;
@@ -891,13 +890,11 @@ public abstract class MockCatalogReader extends CalciteCatalogReader {
         return table;
       }
 
-      @Override
-      public @Nullable Object getFilter(String columnName) {
+      @Override public @Nullable Object getFilter(String columnName) {
         return alwaysFilterFields.get(columnName);
       }
 
-      @Override
-      public boolean hasFilter(String columnName) {
+      @Override public boolean hasFilter(String columnName) {
         return alwaysFilterFields.containsKey(columnName);
       }
     }

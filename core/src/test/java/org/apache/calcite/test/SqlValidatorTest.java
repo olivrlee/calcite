@@ -15,20 +15,14 @@
  * limitations under the License.
  */
 package org.apache.calcite.test;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map.Entry;
-import java.util.Set;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.avatica.util.Quoting;
 import org.apache.calcite.avatica.util.TimeUnit;
 import org.apache.calcite.config.Lex;
-import org.apache.calcite.rel.RelCollation;
 import org.apache.calcite.rel.type.DelegatingTypeSystem;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.rel.type.RelDataTypeSystem;
-import org.apache.calcite.rel.type.StructKind;
 import org.apache.calcite.rel.type.TimeFrameSet;
 import org.apache.calcite.runtime.CalciteContextException;
 import org.apache.calcite.sql.SqlCollation;
@@ -57,13 +51,10 @@ import org.apache.calcite.sql.validate.SqlValidator;
 import org.apache.calcite.sql.validate.SqlValidatorCatalogReader;
 import org.apache.calcite.sql.validate.SqlValidatorImpl;
 import org.apache.calcite.sql.validate.SqlValidatorUtil;
-import org.apache.calcite.sql2rel.InitializerExpressionFactory;
 import org.apache.calcite.sql2rel.NullInitializerExpressionFactory;
 import org.apache.calcite.test.catalog.CountingFactory;
 import org.apache.calcite.test.catalog.MockCatalogReader;
-import org.apache.calcite.test.catalog.MockCatalogReader.ColumnResolver;
 import org.apache.calcite.test.catalog.MockCatalogReader.MockSchema;
-import org.apache.calcite.test.catalog.MockCatalogReader.MockTable;
 import org.apache.calcite.test.catalog.MockCatalogReader.MockViewTable.AlwaysFilterMockTable;
 import org.apache.calcite.testlib.annotations.LocaleEnUs;
 import org.apache.calcite.tools.ValidationException;
@@ -11716,8 +11707,8 @@ public class SqlValidatorTest extends SqlValidatorTestCase {
               put("JOB", "JOB_1");
             }};
             // Register "EMP" table.
-            AlwaysFilterMockTable empTable = AlwaysFilterMockTable.create(this, salesSchema, "EMP", false, 14, null,
-                NullInitializerExpressionFactory.INSTANCE, false, empAlwaysFilterFields);
+            AlwaysFilterMockTable empTable =
+                AlwaysFilterMockTable.create(this, salesSchema, "EMP", false, 14, null, NullInitializerExpressionFactory.INSTANCE, false, empAlwaysFilterFields);
             empTable.setAlwaysFilterFields(empAlwaysFilterFields);
 
             empTable.addColumn("EMPNO", typeFactory.createSqlType(SqlTypeName.INTEGER), true);
@@ -11735,9 +11726,8 @@ public class SqlValidatorTest extends SqlValidatorTestCase {
             Map<String, Object> deptAlwaysFilterFields = new HashMap<String, Object>() {{
               put("NAME", "ACCOUNTING_DEPT");
             }};
-            AlwaysFilterMockTable deptTable = AlwaysFilterMockTable.create(this, salesSchema, "DEPT", false, 14, null,
-                NullInitializerExpressionFactory.INSTANCE, false, deptAlwaysFilterFields);
-            // deptTable.setAlwaysFilterFields();
+            AlwaysFilterMockTable deptTable =
+                AlwaysFilterMockTable.create(this, salesSchema, "DEPT", false, 14, null, NullInitializerExpressionFactory.INSTANCE, false, deptAlwaysFilterFields);
             deptTable.addColumn("DEPTNO", typeFactory.createSqlType(SqlTypeName.INTEGER), true);
             deptTable.addColumn("NAME", typeFactory.createSqlType(SqlTypeName.VARCHAR));
             registerTable(deptTable);
@@ -11745,15 +11735,68 @@ public class SqlValidatorTest extends SqlValidatorTestCase {
           }
         }.init();
 
-    String sql = "select * from (select * from emp where empno = 1)";
-    // String sql = "select * from emp where empno = 1";
-    // String sql = "select * from emp where concat(emp.ename, ' ') = 'abc'";
-    final SqlValidatorFixture s = fixture()
+    final SqlValidatorFixture fixture = fixture()
         .withOperatorTable(operatorTableFor(SqlLibrary.POSTGRESQL))
-        .withCatalogReader(catalogReaderFactory)
-        .withSql(sql)
-        .fails(
-            "SQL statement did not contain filters on the following fields: \\[JOB\\]");
+        .withCatalogReader(catalogReaderFactory);
+
+    // //Basic query
+    // fixture.withSql("select empno from emp where job = 'doctor' and empno = 1").ok();
+    // fixture.withSql("select * from emp where concat(emp.empno, ' ') = 'abc'")
+    //     .fails("SQL statement did not contain filters on the following fields: \\[JOB\\]");
+    //
+    // //SUBQUERIES
+    // fixture.withSql("select * from (select * from emp where empno = 1) where job = 'doctor'").ok();
+    // fixture.withSql("select * from (select * from emp where job = 'doctor') where empno = 1").ok();
+    // fixture.withSql("select * from (select empno from emp where job = 'doctor') where empno = 1").ok();
+    // fixture.withSql("select * from (select * from emp where empno = 1)")
+    //     .fails("SQL statement did not contain filters on the following fields: \\[JOB\\]");
+    //
+    // //JOINs
+    // fixture.withSql("select * from emp join dept on emp.deptno = dept.deptno")
+    //     .fails("SQL statement did not contain filters on the following fields: "
+    //         + "\\[EMPNO, JOB, NAME\\]");
+    // fixture.withSql("select * from emp join dept on emp.deptno = dept.deptno where emp.empno = 1")
+    //     .fails("SQL statement did not contain filters on the following fields: "
+    //         + "\\[JOB, NAME\\]");
+    // fixture.withSql("select * from emp join dept on emp.deptno = dept.deptno "
+    //     + "where emp.empno = 1 and emp.job = 'doctor' and dept.name = 'ACCOUNTING'").ok();
+    // fixture.withSql("select * from emp join dept on emp.deptno = dept.deptno "
+    //     + "where empno = 1 and job = 'doctor' and dept.name = 'ACCOUNTING'").ok();
+    //
+    // //USING
+    // fixture.withSql("select * from emp join dept using(deptno) where emp.empno = 1")
+    //     .fails("SQL statement did not contain filters on the following fields: "
+    //         + "\\[JOB, NAME\\]");
+    // fixture.withSql("select * from emp join dept using(deptno) "
+    //     + "where emp.empno = 1 and emp.job = 'doctor' and dept.name = 'ACCOUNTING'").ok();
+
+    //GROUP BY (HAVING)
+    // fixture.withSql("select * from dept group by deptno, name having name = 'accounting_dept'").ok();
+    // fixture.withSql("select * from dept group by deptno, name ")
+    //     .fails("SQL statement did not contain filters on the following fields: "
+    //         + "\\[NAME\\]");
+    // fixture.withSql("select name from dept group by name having name = 'accounting'").ok();
+    // fixture.withSql("select name from dept group by name ")
+    //     .fails("SQL statement did not contain filters on the following fields: "
+    //         + "\\[NAME\\]");
+    // fixture.withSql("select sum(sal) from emp where empno > 10 and job = 'doctor' group by empno "
+    //     + "having sum(sal) > 100").ok();
+    // fixture.withSql("select sum(sal) from emp where empno > 10 group by empno having sum(sal) > 100")
+    //     .fails("SQL statement did not contain filters on the following fields: \\[JOB\\]");
+    // //CTE
+    // fixture.withSql("WITH cte AS (select * from emp order by empno) SELECT * from cte")
+    //     .fails("SQL statement did not contain filters on the following fields: \\[EMPNO, JOB\\]");
+    // fixture.withSql("WITH cte AS (select * from emp where empno = 1) SELECT * from cte")
+    //     .fails("SQL statement did not contain filters on the following fields: \\[JOB\\]");
+    // fixture.withSql("WITH cte AS (select * from emp where empno = 1 and job = 'doctor') SELECT * from cte")
+    //     .ok();
+    // fixture.withSql("WITH cte AS (select * from emp) SELECT * from cte where empno = 1")
+    //     .fails("SQL statement did not contain filters on the following fields: \\[JOB\\]");
+    // fixture.withSql("WITH cte AS (select * from emp) SELECT * from cte where empno = 1 and job = 'doctor'")
+    //     .ok();
+    fixture.withSql("WITH cte AS (select empno, job from emp) "
+            + "SELECT * from cte where empno = 1 and job = 'doctor'")
+        .ok();
   }
 
   @Test void testAccessingNestedFieldsOfNullableRecord() {

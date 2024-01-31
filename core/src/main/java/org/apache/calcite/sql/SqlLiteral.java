@@ -16,9 +16,6 @@
  */
 package org.apache.calcite.sql;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 import org.apache.calcite.avatica.util.TimeUnit;
 import org.apache.calcite.avatica.util.TimeUnitRange;
 import org.apache.calcite.rel.metadata.NullSentinel;
@@ -32,7 +29,6 @@ import org.apache.calcite.sql.type.SqlTypeFamily;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.sql.type.SqlTypeUtil;
 import org.apache.calcite.sql.util.SqlVisitor;
-import org.apache.calcite.sql.validate.AlwaysFilterValidator;
 import org.apache.calcite.sql.validate.SqlMonotonicity;
 import org.apache.calcite.sql.validate.SqlValidator;
 import org.apache.calcite.sql.validate.SqlValidatorScope;
@@ -50,6 +46,8 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import static org.apache.calcite.linq4j.Nullness.castNonNull;
@@ -582,12 +580,6 @@ public class SqlLiteral extends SqlNode {
     validator.validateLiteral(this);
   }
 
-  @Override
-  public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
-      Set<String> alwaysFilterFields) {
-    System.out.println("SqlLiteral");
-  }
-
   @Override public <R> R accept(SqlVisitor<R> visitor) {
     return visitor.visit(this);
   }
@@ -607,8 +599,7 @@ public class SqlLiteral extends SqlNode {
     return SqlMonotonicity.CONSTANT;
   }
 
-  @Override
-  public List<SqlIdentifier> collectSqlIdentifiers() {
+  @Override public List<SqlIdentifier> collectSqlIdentifiers() {
     return Collections.emptyList();
   }
 

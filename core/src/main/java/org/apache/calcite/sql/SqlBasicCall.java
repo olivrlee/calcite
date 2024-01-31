@@ -16,13 +16,12 @@
  */
 package org.apache.calcite.sql;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.util.ImmutableNullableList;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 

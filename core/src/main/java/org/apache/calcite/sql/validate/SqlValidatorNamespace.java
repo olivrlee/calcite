@@ -16,7 +16,6 @@
  */
 package org.apache.calcite.sql.validate;
 
-import java.util.Set;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeField;
 import org.apache.calcite.sql.SqlNode;
@@ -26,6 +25,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.qual.Pure;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * A namespace describes the relation returned by a section of a SQL query.

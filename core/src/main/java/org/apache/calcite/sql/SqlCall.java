@@ -16,8 +16,6 @@
  */
 package org.apache.calcite.sql;
 
-import java.util.Collections;
-import java.util.Set;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.util.SqlVisitor;
@@ -34,8 +32,10 @@ import org.checkerframework.dataflow.qual.Pure;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import static org.apache.calcite.linq4j.Nullness.castNonNull;
 
@@ -146,10 +146,9 @@ public abstract class SqlCall extends SqlNode {
     validator.validateCall(this, scope);
   }
 
-  @Override
-  public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
+  @Override public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
       Set<String> alwaysFilterFields) {
-    System.out.println("SqlCall");
+    validator.validateQueryAlwaysFilter(this, scope, alwaysFilterFields);
   }
 
   @Override public void findValidOptions(

@@ -16,7 +16,6 @@
  */
 package org.apache.calcite.sql;
 
-import java.util.Set;
 import org.apache.calcite.sql.fun.SqlInternalOperators;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.validate.AlwaysFilterValidator;
@@ -29,6 +28,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.qual.Pure;
 
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
@@ -316,8 +316,7 @@ public class SqlSelect extends SqlCall {
     return where != null;
   }
 
-  @Override
-  public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
+  @Override public void validateAlwaysFilter(AlwaysFilterValidator validator, SqlValidatorScope scope,
       Set<String> alwaysFilterFields) {
     validator.validateQueryAlwaysFilter(this, scope, alwaysFilterFields);
   }

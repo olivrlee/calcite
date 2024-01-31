@@ -35,7 +35,6 @@ import org.apache.calcite.sql.advise.SqlAdvisor;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParser;
-import org.apache.calcite.sql.validate.AlwaysFilterValidator;
 import org.apache.calcite.sql.validate.SqlConformance;
 import org.apache.calcite.sql.validate.SqlValidator;
 import org.apache.calcite.sql.validate.SqlValidatorCatalogReader;
@@ -71,7 +70,6 @@ public class SqlTestFactory {
           SqlTestFactory::createTypeFactory, MockRelOptPlanner::new,
           Contexts.of(), UnaryOperator.identity(),
           SqlValidatorUtil::newValidator,
-          // SqlValidatorUtil::newAlwaysFilterValidator,
           ConnectionFactories.empty()
               .with(ConnectionFactories.add(CalciteAssert.SchemaSpec.HR)),
           SqlParser.Config.DEFAULT,
@@ -88,9 +86,6 @@ public class SqlTestFactory {
   private final Context plannerContext;
   private final UnaryOperator<RelOptCluster> clusterTransform;
   private final ValidatorFactory validatorFactory;
-
-  // private final AlwaysFilterValidatorFactory alwaysFilterValidatorFactory;
-
   private final Supplier<RelDataTypeFactory> typeFactorySupplier;
   private final SqlOperatorTable operatorTable;
   private final Supplier<SqlValidatorCatalogReader> catalogReaderSupplier;
@@ -103,7 +98,6 @@ public class SqlTestFactory {
       TypeFactoryFactory typeFactoryFactory, PlannerFactory plannerFactory,
       Context plannerContext, UnaryOperator<RelOptCluster> clusterTransform,
       ValidatorFactory validatorFactory,
-      // AlwaysFilterValidatorFactory alwaysFilerValidatorFactory,
       ConnectionFactory connectionFactory,
       SqlParser.Config parserConfig, SqlValidator.Config validatorConfig,
       SqlToRelConverter.Config sqlToRelConfig, SqlOperatorTable operatorTable,
@@ -118,8 +112,6 @@ public class SqlTestFactory {
         requireNonNull(clusterTransform, "clusterTransform");
     this.validatorFactory =
         requireNonNull(validatorFactory, "validatorFactory");
-    // this.alwaysFilterValidatorFactory =
-    //     requireNonNull(alwaysFilerValidatorFactory, "alwaysFilerValidatorFactory");
     this.connectionFactory =
         requireNonNull(connectionFactory, "connectionFactory");
     this.sqlToRelConfig = requireNonNull(sqlToRelConfig, "sqlToRelConfig");
@@ -147,11 +139,6 @@ public class SqlTestFactory {
         typeFactorySupplier.get(), validatorConfig);
   }
 
-  // public AlwaysFilterValidator createAlwaysFilterValidator() {
-  //   return alwaysFilterValidatorFactory.create(operatorTable, catalogReaderSupplier.get(),
-  //       typeFactorySupplier.get(), validatorConfig);
-  // }
-
   public SqlAdvisor createAdvisor() {
     SqlValidator validator = createValidator();
     if (validator instanceof SqlValidatorWithHints) {
@@ -167,7 +154,7 @@ public class SqlTestFactory {
       return this;
     }
     return new SqlTestFactory(catalogReaderFactory, typeFactoryFactory,
-        plannerFactory, plannerContext, clusterTransform, validatorFactory, //alwaysFilterValidatorFactory,
+        plannerFactory, plannerContext, clusterTransform, validatorFactory,
         connectionFactory, parserConfig, validatorConfig, sqlToRelConfig,
         operatorTable, typeSystemTransform);
   }
@@ -178,7 +165,7 @@ public class SqlTestFactory {
       return this;
     }
     return new SqlTestFactory(catalogReaderFactory, typeFactoryFactory,
-        plannerFactory, plannerContext, clusterTransform, validatorFactory, //alwaysFilterValidatorFactory,
+        plannerFactory, plannerContext, clusterTransform, validatorFactory,
         connectionFactory, parserConfig, validatorConfig, sqlToRelConfig,
         operatorTable, typeSystemTransform);
   }
@@ -188,7 +175,7 @@ public class SqlTestFactory {
       return this;
     }
     return new SqlTestFactory(catalogReaderFactory, typeFactoryFactory,
-        plannerFactory, plannerContext, clusterTransform, validatorFactory, //alwaysFilterValidatorFactory,
+        plannerFactory, plannerContext, clusterTransform, validatorFactory,
         connectionFactory, parserConfig, validatorConfig, sqlToRelConfig,
         operatorTable, typeSystemTransform);
   }
@@ -200,7 +187,7 @@ public class SqlTestFactory {
       return this;
     }
     return new SqlTestFactory(catalogReaderFactory, typeFactoryFactory,
-        plannerFactory, plannerContext, clusterTransform, validatorFactory, //alwaysFilterValidatorFactory,
+        plannerFactory, plannerContext, clusterTransform, validatorFactory,
         connectionFactory, parserConfig, validatorConfig, sqlToRelConfig,
         operatorTable, typeSystemTransform);
   }
@@ -209,7 +196,7 @@ public class SqlTestFactory {
     final UnaryOperator<RelOptCluster> clusterTransform =
         this.clusterTransform.andThen(transform)::apply;
     return new SqlTestFactory(catalogReaderFactory, typeFactoryFactory,
-        plannerFactory, plannerContext, clusterTransform, validatorFactory, //alwaysFilterValidatorFactory,
+        plannerFactory, plannerContext, clusterTransform, validatorFactory,
         connectionFactory, parserConfig, validatorConfig, sqlToRelConfig,
         operatorTable, typeSystemTransform);
   }
@@ -220,7 +207,7 @@ public class SqlTestFactory {
       return this;
     }
     return new SqlTestFactory(catalogReaderFactory, typeFactoryFactory,
-        plannerFactory, plannerContext, clusterTransform, validatorFactory, //alwaysFilterValidatorFactory,
+        plannerFactory, plannerContext, clusterTransform, validatorFactory,
         connectionFactory, parserConfig, validatorConfig, sqlToRelConfig,
         operatorTable, typeSystemTransform);
   }
@@ -230,7 +217,7 @@ public class SqlTestFactory {
       return this;
     }
     return new SqlTestFactory(catalogReaderFactory, typeFactoryFactory,
-        plannerFactory, plannerContext, clusterTransform, validatorFactory, //alwaysFilterValidatorFactory,
+        plannerFactory, plannerContext, clusterTransform, validatorFactory,
         connectionFactory, parserConfig, validatorConfig, sqlToRelConfig,
         operatorTable, typeSystemTransform);
   }
@@ -243,7 +230,7 @@ public class SqlTestFactory {
       return this;
     }
     return new SqlTestFactory(catalogReaderFactory, typeFactoryFactory,
-        plannerFactory, plannerContext, clusterTransform, validatorFactory, //alwaysFilterValidatorFactory,
+        plannerFactory, plannerContext, clusterTransform, validatorFactory,
         connectionFactory, parserConfig, validatorConfig, sqlToRelConfig,
         operatorTable, typeSystemTransform);
   }
@@ -256,7 +243,7 @@ public class SqlTestFactory {
       return this;
     }
     return new SqlTestFactory(catalogReaderFactory, typeFactoryFactory,
-        plannerFactory, plannerContext, clusterTransform, validatorFactory, //alwaysFilterValidatorFactory,
+        plannerFactory, plannerContext, clusterTransform, validatorFactory,
         connectionFactory, parserConfig, validatorConfig, sqlToRelConfig,
         operatorTable, typeSystemTransform);
   }
@@ -280,7 +267,7 @@ public class SqlTestFactory {
       return this;
     }
     return new SqlTestFactory(catalogReaderFactory, typeFactoryFactory,
-        plannerFactory, plannerContext, clusterTransform, validatorFactory, //alwaysFilterValidatorFactory,
+        plannerFactory, plannerContext, clusterTransform, validatorFactory,
         connectionFactory, parserConfig, validatorConfig, sqlToRelConfig,
         operatorTable, typeSystemTransform);
   }
@@ -293,7 +280,7 @@ public class SqlTestFactory {
       return this;
     }
     return new SqlTestFactory(catalogReaderFactory, typeFactoryFactory,
-        plannerFactory, plannerContext, clusterTransform, validatorFactory, //alwaysFilterValidatorFactory,
+        plannerFactory, plannerContext, clusterTransform, validatorFactory,
         connectionFactory, parserConfig, validatorConfig, sqlToRelConfig,
         operatorTable, typeSystemTransform);
   }
@@ -306,7 +293,7 @@ public class SqlTestFactory {
       return this;
     }
     return new SqlTestFactory(catalogReaderFactory, typeFactoryFactory,
-        plannerFactory, plannerContext, clusterTransform, validatorFactory, //alwaysFilterValidatorFactory,
+        plannerFactory, plannerContext, clusterTransform, validatorFactory,
         connectionFactory, parserConfig, validatorConfig, sqlToRelConfig,
         operatorTable, typeSystemTransform);
   }
@@ -349,15 +336,6 @@ public class SqlTestFactory {
   /** Creates {@link SqlValidator} for tests. */
   public interface ValidatorFactory {
     SqlValidator create(
-        SqlOperatorTable opTab,
-        SqlValidatorCatalogReader catalogReader,
-        RelDataTypeFactory typeFactory,
-        SqlValidator.Config config);
-  }
-
-  /** Creates {@link AlwaysFilterValidator} for tests. */
-  public interface AlwaysFilterValidatorFactory {
-    AlwaysFilterValidator create(
         SqlOperatorTable opTab,
         SqlValidatorCatalogReader catalogReader,
         RelDataTypeFactory typeFactory,

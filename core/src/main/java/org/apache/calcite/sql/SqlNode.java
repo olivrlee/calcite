@@ -16,7 +16,6 @@
  */
 package org.apache.calcite.sql;
 
-import java.util.Collections;
 import org.apache.calcite.sql.dialect.AnsiSqlDialect;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.pretty.SqlPrettyWriter;
@@ -34,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -249,8 +249,7 @@ public abstract class SqlNode implements Cloneable {
   public void validateAlwaysFilter(
       AlwaysFilterValidator validator,
       SqlValidatorScope scope,
-      Set<String> alwaysFilterFields
-  ) {
+      Set<String> alwaysFilterFields) {
     System.out.println("SqlNode");
   };
 
