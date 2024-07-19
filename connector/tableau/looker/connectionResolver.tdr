@@ -17,7 +17,7 @@
   ~
   ~ Connection resolver, part of the Tableau connector SDK; see manifest.xml.
   -->
-<tdr class='looker-jdbc'>
+<tdr class='looker'>
 	<connection-resolver>
     <connection-builder>
       <script file='connectionBuilder.js'/>
