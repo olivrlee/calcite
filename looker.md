@@ -46,9 +46,9 @@ The script will only make local changes.
 You'll have a chance to review them before pushing anything to Artifact Registry or GitHub.
 Upload to Artifact Registry by running `looker-upload-artifact-registry.sh` after checking the release looks right.
 
-Each release will have a name like `1.21.1-looker` (if the most
-recent official Calcite release is `1.38`) and have a git tag
-`calcite-1.38.0-looker`.
+Each Looker release will have a name like `1.38.1-looker` (if the most
+recent official Calcite release that it is based off of is `1.38`) and have a git tag
+`calcite-1.38.1-looker`.
 
 You should make it from a branch that differs from Calcite's
 `master` branch in only minor ways:
