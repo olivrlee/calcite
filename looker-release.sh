@@ -88,7 +88,6 @@ calcite.version=$NEXT_VERSION
         echo -e "- Prior fixups, if any..." >&2
         echo -e "- All commits from upstream..." >&2
         echo -e "\nIf everything looks good, you can publish to Artifact Registry with this command:\n" >&2
-        echo -e "(*Remember to update the build version in gradle.properties for the release artifact before running*\n)" >&2
         echo -e "    ./looker-upload-artifact-registry.sh\n" >&2
         echo -e "And you can push the release tag and force-push the looker branch to looker-open-source with these commands:\n" >&2
         echo -e "    git push git@github.com:looker-open-source/calcite.git $NEXT_TAG"

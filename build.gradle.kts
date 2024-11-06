@@ -138,9 +138,7 @@ tasks.validateBeforeBuildingReleaseArtifacts {
 
 val String.v: String get() = rootProject.extra["$this.version"] as String
 
-// Looker Instructions: Keep the first line with the suffix for development snapshots; use the second for release builds.
-val buildVersion = "calcite".v + releaseParams.snapshotSuffix
-// val buildVersion = "calcite".v
+val buildVersion = if (project.gradle.startParameter.projectProperties["release"] == "true") { "calcite".v } else {"calcite".v + releaseParams.snapshotSuffix}
 
 println("Building Apache Calcite $buildVersion")
 
