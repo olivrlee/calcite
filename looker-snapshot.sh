@@ -19,7 +19,7 @@
 # $1 is the sub-project directory
 # $2 is the artifact ID
 # $3 is the version
-function snapshot_upload {
+function artifact_registry_snapshot_upload {
     mvn deploy:deploy-file \
         -DgroupId=org.apache.calcite \
         -DartifactId="$2" \
@@ -28,16 +28,16 @@ function snapshot_upload {
         -Dfile="./$1/build/libs/$2-$3.jar" \
         -DgeneratePom=false \
         -DpomFile="./$1/build/publications/$1/pom-default.xml" \
-        -DrepositoryId=nexus \
-        -Durl=https://nexusrepo.looker.com/repository/maven-snapshots/
+        -DrepositoryId=artifact-registry \
+        -Durl=https://us-maven.pkg.dev/prow-build-looker/looker-maven-snapshots
 }
 
-./gradlew build -x :redis:test && ./gradlew jar && ./gradlew generatePom && (
+./gradlew build -x test && ./gradlew jar && ./gradlew generatePom && (
     VERSION="$(sed -n 's/^calcite\.version=\([^ ]*\).*/\1/p' gradle.properties)-SNAPSHOT"
-    snapshot_upload core calcite-core "$VERSION"
-    snapshot_upload babel calcite-babel "$VERSION"
-    snapshot_upload linq4j calcite-linq4j "$VERSION"
-    snapshot_upload testkit calcite-testkit "$VERSION"
+    artifact_registry_snapshot_upload core calcite-core "$VERSION"
+    artifact_registry_snapshot_upload babel calcite-babel "$VERSION"
+    artifact_registry_snapshot_upload linq4j calcite-linq4j "$VERSION"
+    artifact_registry_snapshot_upload testkit calcite-testkit "$VERSION"
     echo
-    echo "Done uploading version ${VERSION} to Looker Nexus Snapshots!"
+    echo "Done uploading version ${VERSION} to Looker Artifact Registry Snapshots!"
 )

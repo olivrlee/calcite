@@ -27,8 +27,8 @@ Do not merge to Calcite's master branch.
 *Read the instructions* in the `looker-release.sh` script,
 but do not run that script until you're ready to publish a production release.
 
-Looker has poor infrastructure for testing with local builds of Avatica.
-The easiest way is to upload a snapshot version to Looker's Nexus repository and use it.
+Looker has poor infrastructure for testing with local builds of Calcite.
+The easiest way is to upload a snapshot version to Looker's Artifact Registry repository and use it.
 To upload a snapshot version, simply run `./looker-snapshot.sh`,
 which runs `./gradlew build` and, if successful,
 uploads the resulting snapshot artifacts to the repo
@@ -39,48 +39,16 @@ and you're ready to build.
 
 ## Release
 
-Define Looker's Nexus repository in your `~/.gradle/init.gradle.kts`
-file:
 
-```kotlin
-allprojects {
-    plugins.withId("maven-publish") {
-        configure<PublishingExtension> {
-            repositories {
-                maven {
-                    name = "lookerNexus"
-                    val baseUrl = "https://nexusrepo.looker.com"
-                    val releasesUrl = "$baseUrl/repository/maven-releases"
-                    val snapshotsUrl = "$baseUrl/repository/maven-snapshots"
-                    val release = !project.version.toString().endsWith("-SNAPSHOT")
-                    // val release = project.hasProperty("release")
-                    url = uri(if (release) releasesUrl else snapshotsUrl)
-                    credentials {
-                        username = "xxx"
-                        password = "xxx"
-                    }
-                }
-            }
-        }
-    }
-}
-```
-
-In the above fragment, replace the values of the `username` and
-`password` properties with the secret credentials.
-
-*NOTE* This fragment *must* be in a file outside of your git sandbox.
-If the file were in the git sandbox, it would be too easy to
-accidentally commit the secret credentials and expose them on a
-public site.
 
 *Read the instructions* in the `looker-release.sh` script, then run it.
 The script will only make local changes.
-You'll have a chance to review them before pushing anything to Nexus or GitHub.
+You'll have a chance to review them before pushing anything to Artifact Registry or GitHub.
+Upload to Artifact Registry by running `looker-upload-artifact-registry.sh` after checking the release looks right.
 
 Each release will have a name like `1.21.1-looker` (if the most
-recent official Calcite release is `1.21`) and have a git tag
-`calcite-1.21.1-looker`.
+recent official Calcite release is `1.38`) and have a git tag
+`calcite-1.38.0-looker`.
 
 You should make it from a branch that differs from Calcite's
 `master` branch in only minor ways:
@@ -101,5 +69,4 @@ You should make it from a branch that differs from Calcite's
   so the version in trunk is generally decremented
   while adding the `-looker` suffix.
 
-Check the artifacts
-[on Nexus](https://nexusproxy.looker.com/#browse/search=keyword%3Dorg.apache.calcite).
+Check the artifacts on Artifact Registry.

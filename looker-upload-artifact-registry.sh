@@ -19,7 +19,9 @@
 # $1 is the sub-project directory
 # $2 is the artifact ID
 # $3 is the version
-function artifact_registry_upload {
+
+# Note: Redeployment of the same versioned artifact (same name, repeated uploads) is prohibited.
+function artifact_registry_release_upload {
     mvn deploy:deploy-file \
         -DgroupId=org.apache.calcite \
         -DartifactId="$2" \
@@ -32,12 +34,12 @@ function artifact_registry_upload {
         -Durl=https://us-maven.pkg.dev/prow-build-looker/looker-maven-private
 }
 
-./gradlew build -x :redis:test && ./gradlew jar && ./gradlew generatePom && (
+./gradlew build -x test && ./gradlew jar && ./gradlew generatePom && (
     VERSION="$(sed -n 's/^calcite\.version=\([^ ]*\).*/\1/p' gradle.properties)"
-    artifact_registry_upload core calcite-core "$VERSION"
-    artifact_registry_upload babel calcite-babel "$VERSION"
-    artifact_registry_upload linq4j calcite-linq4j "$VERSION"
-    artifact_registry_upload testkit calcite-testkit "$VERSION"
+    artifact_registry_release_upload core calcite-core "$VERSION"
+    artifact_registry_release_upload babel calcite-babel "$VERSION"
+    artifact_registry_release_upload linq4j calcite-linq4j "$VERSION"
+    artifact_registry_release_upload testkit calcite-testkit "$VERSION"
     echo
     echo "Done uploading version ${VERSION} to Looker Artifact Registry!"
 )
